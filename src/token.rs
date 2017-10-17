@@ -29,8 +29,8 @@ use pwasm_abi_derive::eth_dispatch;
 // #[eth_dispatch(Endpoint)]
 pub trait TokenContract {
     fn ctor(&self, total_supply: U256);
-	fn balanceOf(&self, _owner: Address) -> U256;
-	fn transfer(&self, _to: Address, _amount: U256) -> bool;
+    fn balanceOf(&self, _owner: Address) -> U256;
+    fn transfer(&self, _to: Address, _amount: U256) -> bool;
     // fn totalSupply(&self) -> U256;
 }
 
