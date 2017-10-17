@@ -28,8 +28,9 @@ use pwasm_abi_derive::eth_dispatch;
 #[allow(non_snake_case)]
 // #[eth_dispatch(Endpoint)]
 pub trait TokenContract {
-	fn balanceOf(&self, _owner: &Address) -> U256;
-	fn transfer(&self, _to: &Address, _amount: U256) -> bool;
+    // fn ctor(&self);
+	fn balanceOf(&self, _owner: Address) -> U256;
+	fn transfer(&self, _to: Address, _amount: U256) -> bool;
     // fn totalSupply(&self) -> U256;
 }
 
@@ -37,29 +38,33 @@ struct TokenContractInstance;
 
 #[allow(non_snake_case)]
 impl TokenContract for TokenContractInstance {
-    // fn ctor(&mut self) {
+    // fn ctor(&mut self, total_supply U256) {
 
     // }
-    fn balanceOf(&self, _owner: &Address) -> U256 {
-        storage::read(&balance(_owner)).unwrap_or([0u8;32]).into()
+    fn balanceOf(&self, _owner: Address) -> U256 {
+        balanceOf(&_owner)
     }
-    fn transfer(&self, _to: &Address, _amount: U256) -> bool {
+    fn transfer(&self, _to: Address, _amount: U256) -> bool {
         let sender = ext::sender();
-        let mut senderBalance = self.balanceOf(&sender);
-        let mut recipientBalance = self.balanceOf(_to);
+        let mut senderBalance = balanceOf(&sender);
+        let mut recipientBalance = balanceOf(&_to);
         if _amount == 0.into() || senderBalance < _amount {
             false
         } else {
             senderBalance = senderBalance - _amount;
             recipientBalance = recipientBalance + _amount;
-            storage::write(&balance(&sender), &senderBalance.into()).unwrap();
-            storage::write(&balance(_to), &recipientBalance.into()).unwrap();
+            storage::write(&balance_key(&sender), &senderBalance.into()).unwrap();
+            storage::write(&balance_key(&_to), &recipientBalance.into()).unwrap();
             true
         }
     }
 }
 
-fn balance(address: &Address) -> H256 {
+fn balanceOf(_owner: &Address) -> U256 {
+    storage::read(&balance_key(_owner)).unwrap_or([0u8;32]).into()
+}
+
+fn balance_key(address: &Address) -> H256 {
     let mut key = H256::from(address);
     key[0] = 1; // just a naiive "namespace";
     key
@@ -70,6 +75,13 @@ fn balance(address: &Address) -> H256 {
 
 #[no_mangle]
 pub fn call(desc: *mut u8) {
+    // let (args, result) = unsafe { pwasm_std::parse_args(desc) };
+    // let mut endpoint = Endpoint::new(TokenContractInstance{});
+    // result.done(endpoint.dispatch(args));
+}
+
+#[no_mangle]
+pub fn create(desc: *mut u8) {
     // let (args, result) = unsafe { pwasm_std::parse_args(desc) };
     // let mut endpoint = Endpoint::new(TokenContractInstance{});
     // result.done(endpoint.dispatch(args));
@@ -95,7 +107,7 @@ mod tests {
         check_balance {
             let address = Address::from([31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31]);
             let contract = TokenContractInstance{};
-            assert_eq!(contract.balanceOf(&address), 100000.into())
+            assert_eq!(contract.balanceOf(address), 100000.into())
         }
     );
 }
