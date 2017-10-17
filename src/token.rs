@@ -28,7 +28,7 @@ use pwasm_abi_derive::eth_dispatch;
 #[allow(non_snake_case)]
 // #[eth_dispatch(Endpoint)]
 pub trait TokenContract {
-    // fn ctor(&self);
+    fn ctor(&self, total_supply: U256);
 	fn balanceOf(&self, _owner: Address) -> U256;
 	fn transfer(&self, _to: Address, _amount: U256) -> bool;
     // fn totalSupply(&self) -> U256;
@@ -36,18 +36,32 @@ pub trait TokenContract {
 
 struct TokenContractInstance;
 
+static TOTAL_SUPPLY_KEY: H256 = H256([2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+static OWNER_KEY: H256 = H256([3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+
+fn balance_of(_owner: &Address) -> U256 {
+    storage::read(&balance_key(_owner)).unwrap_or([0u8;32]).into()
+}
+
+fn balance_key(address: &Address) -> H256 {
+    let mut key = H256::from(address);
+    key[0] = 1; // just a naiive "namespace";
+    key
+}
+
 #[allow(non_snake_case)]
 impl TokenContract for TokenContractInstance {
-    // fn ctor(&mut self, total_supply U256) {
-
-    // }
+    fn ctor(&self, total_supply: U256) {
+        storage::write(&OWNER_KEY, &H256::from(ext::sender()).into());
+        storage::write(&TOTAL_SUPPLY_KEY, &total_supply.into());
+    }
     fn balanceOf(&self, _owner: Address) -> U256 {
-        balanceOf(&_owner)
+        balance_of(&_owner)
     }
     fn transfer(&self, _to: Address, _amount: U256) -> bool {
         let sender = ext::sender();
-        let mut senderBalance = balanceOf(&sender);
-        let mut recipientBalance = balanceOf(&_to);
+        let mut senderBalance = balance_of(&sender);
+        let mut recipientBalance = balance_of(&_to);
         if _amount == 0.into() || senderBalance < _amount {
             false
         } else {
@@ -58,16 +72,6 @@ impl TokenContract for TokenContractInstance {
             true
         }
     }
-}
-
-fn balanceOf(_owner: &Address) -> U256 {
-    storage::read(&balance_key(_owner)).unwrap_or([0u8;32]).into()
-}
-
-fn balance_key(address: &Address) -> H256 {
-    let mut key = H256::from(address);
-    key[0] = 1; // just a naiive "namespace";
-    key
 }
 
 // myContract.methods.myMethod([param1[, param2[, ...]]]).encodeABI()
