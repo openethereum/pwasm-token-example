@@ -18,20 +18,23 @@ extern crate pwasm_abi_derive;
 extern crate pwasm_test;
 
 use alloc::borrow::Cow;
+use alloc::vec::Vec;
 
 use pwasm_std::{storage, ext};
 use pwasm_std::hash::{Address, H256};
 use pwasm_std::bigint::U256;
 
+use pwasm_abi::eth::ValueType;
 use pwasm_abi_derive::eth_dispatch;
 
+
 #[allow(non_snake_case)]
-// #[eth_dispatch(Endpoint)]
+#[eth_dispatch(Endpoint)]
 pub trait TokenContract {
     fn ctor(&self, total_supply: U256);
     fn balanceOf(&self, _owner: Address) -> U256;
     fn transfer(&self, _to: Address, _amount: U256) -> bool;
-    // fn totalSupply(&self) -> U256;
+    fn totalSupply(&self) -> U256;
 }
 
 struct TokenContractInstance;
@@ -52,8 +55,8 @@ fn balance_key(address: &Address) -> H256 {
 #[allow(non_snake_case)]
 impl TokenContract for TokenContractInstance {
     fn ctor(&self, total_supply: U256) {
-        storage::write(&OWNER_KEY, &H256::from(ext::sender()).into());
-        storage::write(&TOTAL_SUPPLY_KEY, &total_supply.into());
+        storage::write(&OWNER_KEY, &H256::from(ext::sender()).into()).unwrap();
+        storage::write(&TOTAL_SUPPLY_KEY, &total_supply.into()).unwrap();
     }
     fn balanceOf(&self, _owner: Address) -> U256 {
         balance_of(&_owner)
@@ -71,6 +74,9 @@ impl TokenContract for TokenContractInstance {
             storage::write(&balance_key(&_to), &recipientBalance.into()).unwrap();
             true
         }
+    }
+    fn totalSupply(&self) -> U256 {
+        storage::read(&TOTAL_SUPPLY_KEY).unwrap_or([0u8; 32]).into()
     }
 }
 
