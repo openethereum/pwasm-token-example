@@ -7,7 +7,6 @@
 #[cfg(feature="std")]
 extern crate core;
 
-#[cfg(feature="std")]
 extern crate alloc;
 
 extern crate pwasm_std;
@@ -85,17 +84,17 @@ impl TokenContract for TokenContractInstance {
 
 #[no_mangle]
 pub fn call(desc: *mut u8) {
-    // let (args, result) = unsafe { pwasm_std::parse_args(desc) };
-    // let mut endpoint = Endpoint::new(TokenContractInstance{});
-    // result.done(endpoint.dispatch(args));
+    let (args, result) = unsafe { pwasm_std::parse_args(desc) };
+    let mut endpoint = Endpoint::new(TokenContractInstance{});
+    result.done(endpoint.dispatch(&args));
 }
 
-#[no_mangle]
-pub fn create(desc: *mut u8) {
-    // let (args, result) = unsafe { pwasm_std::parse_args(desc) };
-    // let mut endpoint = Endpoint::new(TokenContractInstance{});
-    // result.done(endpoint.dispatch(args));
-}
+// #[no_mangle]
+// pub fn create(desc: *mut u8) {
+//     let (args, _) = unsafe { pwasm_std::parse_args(desc) };
+//     let mut endpoint = Endpoint::new(TokenContractInstance{});
+//     endpoint.dispatch_ctor(&args);
+// }
 
 #[cfg(test)]
 mod tests {

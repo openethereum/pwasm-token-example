@@ -16,3 +16,6 @@ std = ["pwasm-std/std", "pwasm-abi/std"]
 [[bin]]
 name = "token"
 path = "src/token.rs"
+
+[profile.release]
+panic = "abort"
