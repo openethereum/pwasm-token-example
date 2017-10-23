@@ -4,12 +4,12 @@ version = "0.1.0"
 authors = ["Alexey Frolov <frol.rage@gmail.com>"]
 
 [dependencies]
-pwasm-std = { git = "https://github.com/nikvolf/pwasm-std" }
-pwasm-abi = { git = "https://github.com/nikvolf/pwasm-abi" }
-pwasm-abi-derive = { git = "https://github.com/nikvolf/pwasm-abi", path = "derive" }
+pwasm-std = { git = "https://github.com/paritytech/pwasm-std" }
+pwasm-abi = { git = "https://github.com/paritytech/pwasm-abi" }
+pwasm-abi-derive = { git = "https://github.com/paritytech/pwasm-abi", path = "derive" }
 
 [dev-dependencies]
-pwasm-test = { git = "https://github.com/fckt/pwasm-test" }
+pwasm-test = { git = "https://github.com/paritytech/pwasm-test" }
 
 [[bin]]
 name = "token"
