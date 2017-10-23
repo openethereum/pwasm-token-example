@@ -1,21 +1,24 @@
 [package]
-name = "wasm-tests"
+name = "wasm-token-example"
 version = "0.1.0"
-authors = ["NikVolf <frol.rage@gmail.com>"]
+authors = ["Alexey Frolov <frol.rage@gmail.com>"]
 
 [dependencies]
 pwasm-std = { git = "https://github.com/nikvolf/pwasm-std" }
 pwasm-abi = { git = "https://github.com/nikvolf/pwasm-abi" }
 pwasm-abi-derive = { git = "https://github.com/nikvolf/pwasm-abi", path = "derive" }
 
+[dev-dependencies]
 pwasm-test = { git = "https://github.com/fckt/pwasm-test" }
-
-[features]
-std = ["pwasm-std/std", "pwasm-abi/std"]
 
 [[bin]]
 name = "token"
 path = "src/token.rs"
 
+
 [profile.release]
 panic = "abort"
+
+
+[features]
+std = ["pwasm-std/std"]

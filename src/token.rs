@@ -4,17 +4,14 @@
 #![cfg_attr(not(feature="std"), no_main)]
 #![cfg_attr(not(feature="std"), no_std)]
 
-#[cfg(feature="std")]
-extern crate core;
-
+#[cfg(test)]
+#[macro_use]
+extern crate pwasm_test;
 extern crate alloc;
 
 extern crate pwasm_std;
 extern crate pwasm_abi;
 extern crate pwasm_abi_derive;
-
-#[macro_use]
-extern crate pwasm_test;
 
 use alloc::borrow::Cow;
 use alloc::vec::Vec;
@@ -22,8 +19,6 @@ use alloc::vec::Vec;
 use pwasm_std::{storage, ext};
 use pwasm_std::hash::{Address, H256};
 use pwasm_std::bigint::U256;
-
-use pwasm_abi::eth::ValueType;
 use pwasm_abi_derive::eth_dispatch;
 
 
@@ -89,18 +84,19 @@ pub fn call(desc: *mut u8) {
     result.done(endpoint.dispatch(&args));
 }
 
-// #[no_mangle]
-// pub fn create(desc: *mut u8) {
-//     let (args, _) = unsafe { pwasm_std::parse_args(desc) };
-//     let mut endpoint = Endpoint::new(TokenContractInstance{});
-//     endpoint.dispatch_ctor(&args);
-// }
+#[no_mangle]
+pub fn create(desc: *mut u8) {
+    let (args, _) = unsafe { pwasm_std::parse_args(desc) };
+    let mut endpoint = Endpoint::new(TokenContractInstance{});
+    endpoint.dispatch_ctor(&args);
+}
 
 #[cfg(test)]
 mod tests {
+    extern crate std;
     use super::*;
     use pwasm_test::{External, Error};
-    use std::collections::HashMap;
+    use self::std::collections::HashMap;
     test_with_external!(
         DummyExternal: impl External for DummyExternal {
             fn storage(&mut self) -> HashMap<H256, [u8; 32]> {
