@@ -31,10 +31,10 @@ mod contract {
     // two structs: Endpoint and Client.
     //
     // Endpoint is an entry point for contract calls.
-    // Endpoint has a dispatch method which maps Solidity compatible calls into trait calls.
-    // eth_abi macro generates a table of Method IDs for every method signature defined in the trait
-    // and defines it statically in the generated code. Take a look at "pub fn call(desc: *mut u8)" external function
-    // to see how it's used.
+    // eth_abi macro generates a table of Method IDs corresponding with every method signature defined in the trait
+    // and defines it statically in the generated code.
+    // Take a look at "pub fn call(desc: *mut u8)" to see how
+    // Endpoint instantiates with a struct TokenContractInstance which implements the trait definition.
     //
     // Client is a struct which is useful for call generation to a deployed contract. For example:
     // ```
@@ -54,8 +54,6 @@ mod contract {
         fn totalSupply(&mut self) -> U256;
     }
 
-    pub struct TokenContractInstance;
-
     static TOTAL_SUPPLY_KEY: H256 = H256([2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
     static OWNER_KEY: H256 = H256([3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 
@@ -63,21 +61,32 @@ mod contract {
         storage::read(&balance_key(_owner)).unwrap_or([0u8;32]).into()
     }
 
+    // Generates a balance key for some address.
+    // Used to map balances with their owners.
     fn balance_key(address: &Address) -> H256 {
         let mut key = H256::from(address);
         key[0] = 1; // just a naiive "namespace";
         key
     }
 
+    pub struct TokenContractInstance;
     #[allow(non_snake_case)]
     impl TokenContract for TokenContractInstance {
+        /// A contract constructor implementation.
         fn ctor(&mut self, total_supply: U256) {
-            storage::write(&OWNER_KEY, &H256::from(ext::sender()).into()).unwrap();
+            let sender = ext::sender();
+            // Set up the total supply for the token
             storage::write(&TOTAL_SUPPLY_KEY, &total_supply.into()).unwrap();
+            // Give all tokens to the contract owner
+            storage::write(&balance_key(&sender), &total_supply.into()).unwrap();
+            // Set the contract owner
+            storage::write(&OWNER_KEY, &H256::from(sender).into()).unwrap();
         }
+        /// Returns the current balance for some address.
         fn balanceOf(&mut self, _owner: Address) -> U256 {
             balance_of(&_owner)
         }
+        /// Transfer funds
         fn transfer(&mut self, _to: Address, _amount: U256) -> bool {
             let sender = ext::sender();
             let mut senderBalance = balance_of(&sender);
@@ -92,6 +101,7 @@ mod contract {
                 true
             }
         }
+        /// Returns total amount of tokens
         fn totalSupply(&mut self) -> U256 {
             storage::read(&TOTAL_SUPPLY_KEY).unwrap_or([0u8; 32]).into()
         }
