@@ -120,12 +120,12 @@ pub fn call(desc: *mut u8) {
     result.done(endpoint.dispatch(&args));
 }
 
-// #[no_mangle]
-// pub fn create(desc: *mut u8) {
-//     let (args, _) = unsafe { pwasm_std::parse_args(desc) };
-//     let mut endpoint = Endpoint::new(TokenContractInstance{});
-//     endpoint.dispatch_ctor(&args);
-// }
+#[no_mangle]
+pub fn create(desc: *mut u8) {
+    let (args, _) = unsafe { pwasm_std::parse_args(desc) };
+    let mut endpoint = contract::Endpoint::new(contract::TokenContractInstance{});
+    endpoint.dispatch_ctor(&args);
+}
 
 #[cfg(feature="std")]
 #[macro_use]
