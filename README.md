@@ -4,6 +4,6 @@
 - wasm build util, run `cargo install --git https://github.com/paritytech/wasm-utils wasm-build` to install
 - bash to run `./build.sh`
 ## Build
-- `./build.sh`
+`./build.sh`
 ## Testing
 `cargo test --features std`
