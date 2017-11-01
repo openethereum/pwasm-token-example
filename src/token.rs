@@ -72,6 +72,7 @@ mod contract {
     pub struct TokenContractInstance;
     #[allow(non_snake_case)]
     impl TokenContract for TokenContractInstance {
+        
         /// A contract constructor implementation.
         fn ctor(&mut self, total_supply: U256) {
             let sender = ext::sender();
@@ -82,10 +83,12 @@ mod contract {
             // Set the contract owner
             storage::write(&OWNER_KEY, &H256::from(sender).into()).unwrap();
         }
+        
         /// Returns the current balance for some address.
         fn balanceOf(&mut self, _owner: Address) -> U256 {
             balance_of(&_owner)
         }
+        
         /// Transfer funds
         fn transfer(&mut self, _to: Address, _amount: U256) -> bool {
             let sender = ext::sender();
@@ -101,6 +104,7 @@ mod contract {
                 true
             }
         }
+        
         /// Returns total amount of tokens
         fn totalSupply(&mut self) -> U256 {
             storage::read(&TOTAL_SUPPLY_KEY).unwrap_or([0u8; 32]).into()
