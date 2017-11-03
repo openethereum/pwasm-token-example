@@ -54,7 +54,7 @@ mod contract {
         fn totalSupply(&mut self) -> U256;
 
         #[event]
-        fn Transfer(&mut self, indexed_from: Address, indexed_to: Address, indexed_value: U256);
+        fn Transfer(&mut self, indexed_from: Address, indexed_to: Address, value: U256);
     }
 
     static TOTAL_SUPPLY_KEY: H256 = H256([2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
