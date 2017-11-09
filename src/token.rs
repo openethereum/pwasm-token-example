@@ -11,6 +11,8 @@ extern crate pwasm_std;
 extern crate pwasm_abi;
 extern crate pwasm_abi_derive;
 
+use pwasm_abi::eth::EndpointInterface;
+
 mod contract {
     use alloc::borrow::Cow;
     use alloc::vec::Vec;
@@ -145,18 +147,37 @@ mod tests {
     use pwasm_std::bigint::U256;
     use pwasm_std::hash::{Address, H256};
 
-    test_with_external!(
-        DummyExternal: impl External for DummyExternal {
-            fn storage(&mut self) -> HashMap<H256, [u8; 32]> {
-                let mut storage = HashMap::new();
-                storage.insert([1,0,0,0,0,0,0,0,0,0,0,0,
-                                31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31].into(), U256::from(100000).into());
-                storage
-            }
-            fn storage_write(&mut self, _key: &H256, _value: &[u8; 32]) -> Result<(), Error> {
-                Ok(())
+    struct DummyExternal {
+        storage: HashMap<H256, [u8; 32]>
+    }
+
+    impl DummyExternal {
+        fn new() -> Self {
+            let mut storage = HashMap::new();
+            storage.insert([1,0,0,0,0,0,0,0,0,0,0,0,
+                            31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31].into(), U256::from(100000).into());
+            DummyExternal {
+                storage: storage
             }
         }
+    }
+
+    impl External for DummyExternal {
+        fn storage_read(&mut self, key: &H256) -> Result<[u8; 32], Error> {
+            if let Some(value) = self.storage.get(key) {
+                Ok(value.clone())
+            } else {
+                Err(Error)
+            }
+        }
+        fn storage_write(&mut self, _key: &H256, _value: &[u8; 32]) -> Result<(), Error> {
+            // to be fleshed out
+            Ok(())
+        }
+    }
+
+    test_with_external!(
+        DummyExternal::new(),
         check_balance {
             let address = Address::from([31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31]);
             let mut contract = TokenContractInstance{};
