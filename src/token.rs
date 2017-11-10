@@ -202,4 +202,16 @@ mod tests {
             assert_eq!(contract.totalSupply(), total_supply);
         }
     );
+
+    test_with_external!(
+        DummyExternal::new(),
+        should_succeed_in_creating_max_possible_amount_of_tokens {
+            let mut contract = TokenContractInstance{};
+            // set total supply to maximum value of an unsigned 256 bit integer
+            let total_supply = U256::from_dec_str("115792089237316195423570985008687907853269984665640564039457584007913129639935").unwrap();
+            assert_eq!(total_supply, U256::max_value());
+            contract.ctor(total_supply);
+            assert_eq!(contract.totalSupply(), total_supply);
+        }
+    );
 }
