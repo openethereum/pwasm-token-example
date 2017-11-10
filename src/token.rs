@@ -165,6 +165,8 @@ mod tests {
         }
     }
 
+    const SENDER_ADDRESS: &str = "0x16a0772b17ae004e6645e0e95bf50ad69498a34e";
+
     impl External for DummyExternal {
         fn storage_read(&mut self, key: &H256) -> Result<[u8; 32], Error> {
             if let Some(value) = self.storage.get(key) {
@@ -176,6 +178,9 @@ mod tests {
         fn storage_write(&mut self, key: &H256, value: &[u8; 32]) -> Result<(), Error> {
             self.storage.insert(*key, value.clone());
             Ok(())
+        }
+        fn sender(&mut self) -> Address {
+            SENDER_ADDRESS.into()
         }
     }
 
