@@ -173,8 +173,8 @@ mod tests {
                 Err(Error)
             }
         }
-        fn storage_write(&mut self, _key: &H256, _value: &[u8; 32]) -> Result<(), Error> {
-            // to be fleshed out
+        fn storage_write(&mut self, key: &H256, value: &[u8; 32]) -> Result<(), Error> {
+            self.storage.insert(*key, value.clone());
             Ok(())
         }
     }
