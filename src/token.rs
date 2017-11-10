@@ -183,6 +183,70 @@ mod tests {
         }
     }
 
+    /// a builder for quick creation of External impls for testing.
+    /// to be moved to pwasm_test later
+    pub struct ExternalBuilder {
+        storage: HashMap<H256, [u8; 32]>,
+        sender: Address,
+    }
+
+    impl ExternalBuilder {
+        /// begin build process
+        pub fn new() -> Self {
+            ExternalBuilder {
+                storage: HashMap::new(),
+                sender: ExternalBuilder::default_sender(),
+            }
+        }
+
+        /// set the sender
+        pub fn sender(mut self, sender: Address) -> Self {
+            self.sender = sender;
+            self
+        }
+
+        /// write into storage
+        fn storage_write(mut self, key: H256, value: [u8; 32]) -> Self {
+            self.storage.insert(key, value);
+            self
+        }
+
+        /// end build process
+        pub fn build(self) -> BuiltExternal {
+            BuiltExternal {
+                storage: self.storage,
+                sender: self.sender,
+            }
+        }
+
+        pub fn default_sender() -> Address {
+            "0x16a0772b17ae004e6645e0e95bf50ad69498a34e".into()
+        }
+    }
+
+    /// an implementation of External built with ExternalBuilder
+    pub struct BuiltExternal {
+        storage: HashMap<H256, [u8; 32]>,
+        sender: Address,
+    }
+
+    impl External for BuiltExternal {
+        fn storage_read(&mut self, key: &H256) -> Result<[u8; 32], Error> {
+            if let Some(value) = self.storage.get(key) {
+                Ok(value.clone())
+            } else {
+                Err(Error)
+            }
+        }
+        fn storage_write(&mut self, key: &H256, value: &[u8; 32]) -> Result<(), Error> {
+            self.storage.insert(*key, value.clone());
+            Ok(())
+        }
+        fn sender(&mut self) -> Address {
+            self.sender
+        }
+    }
+
     test_with_external!(
         DummyExternal::new(),
         balanceOf_should_return_balance {
