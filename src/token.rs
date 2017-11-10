@@ -214,4 +214,14 @@ mod tests {
             assert_eq!(contract.totalSupply(), total_supply);
         }
     );
+
+    test_with_external!(
+        DummyExternal::new(),
+        should_initially_give_the_total_supply_to_the_creator {
+            let mut contract = TokenContractInstance{};
+            let total_supply = 10000.into();
+            contract.ctor(total_supply);
+            assert_eq!(contract.balanceOf(Address::from(SENDER_ADDRESS)), total_supply);
+        }
+    );
 }
