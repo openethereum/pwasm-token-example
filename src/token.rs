@@ -180,7 +180,7 @@ mod tests {
 
     test_with_external!(
         DummyExternal::new(),
-        check_balance {
+        balanceOf_should_return_balance {
             let address = Address::from([31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31]);
             let mut contract = TokenContractInstance{};
             assert_eq!(contract.balanceOf(address), 100000.into())
