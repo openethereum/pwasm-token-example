@@ -192,4 +192,14 @@ mod tests {
             assert_eq!(contract.balanceOf(address), 100000.into())
         }
     );
+
+    test_with_external!(
+        DummyExternal::new(),
+        totalSupply_should_return_total_supply_contract_was_initialized_with {
+            let mut contract = TokenContractInstance{};
+            let total_supply = 42.into();
+            contract.ctor(total_supply);
+            assert_eq!(contract.totalSupply(), total_supply);
+        }
+    );
 }
