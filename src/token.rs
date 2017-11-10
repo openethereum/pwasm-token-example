@@ -140,6 +140,7 @@ pub fn deploy(desc: *mut u8) {
 extern crate pwasm_test;
 
 #[cfg(test)]
+#[allow(non_snake_case)]
 mod tests {
     extern crate std;
     use pwasm_test;
