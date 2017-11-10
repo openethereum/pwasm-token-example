@@ -248,7 +248,10 @@ mod tests {
     }
 
     test_with_external!(
-        DummyExternal::new(),
+        ExternalBuilder::new()
+            .storage_write([1,0,0,0,0,0,0,0,0,0,0,0,
+                            31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31].into(), U256::from(100000).into())
+            .build(),
         balanceOf_should_return_balance {
             let address = Address::from([31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31]);
             let mut contract = TokenContractInstance{};
@@ -257,7 +260,7 @@ mod tests {
     );
 
     test_with_external!(
-        DummyExternal::new(),
+        ExternalBuilder::new().build(),
         totalSupply_should_return_total_supply_contract_was_initialized_with {
             let mut contract = TokenContractInstance{};
             let total_supply = 42.into();
@@ -267,7 +270,7 @@ mod tests {
     );
 
     test_with_external!(
-        DummyExternal::new(),
+        ExternalBuilder::new().build(),
         should_succeed_in_creating_max_possible_amount_of_tokens {
             let mut contract = TokenContractInstance{};
             // set total supply to maximum value of an unsigned 256 bit integer
@@ -279,12 +282,14 @@ mod tests {
     );
 
     test_with_external!(
-        DummyExternal::new(),
+        ExternalBuilder::new().build(),
         should_initially_give_the_total_supply_to_the_creator {
             let mut contract = TokenContractInstance{};
             let total_supply = 10000.into();
-            contract.constructor(total_supply);
-            assert_eq!(contract.balanceOf(Address::from(SENDER_ADDRESS)), total_supply);
+            contract.ctor(total_supply);
+            assert_eq!(
+                contract.balanceOf(ExternalBuilder::default_sender()),
+                total_supply);
         }
     );
 }
