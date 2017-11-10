@@ -149,40 +149,6 @@ mod tests {
     use pwasm_std::bigint::U256;
     use pwasm_std::hash::{Address, H256};
 
-    struct DummyExternal {
-        storage: HashMap<H256, [u8; 32]>
-    }
-
-    impl DummyExternal {
-        fn new() -> Self {
-            let mut storage = HashMap::new();
-            storage.insert([1,0,0,0,0,0,0,0,0,0,0,0,
-                            31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31].into(), U256::from(100000).into());
-            DummyExternal {
-                storage: storage
-            }
-        }
-    }
-
-    const SENDER_ADDRESS: &str = "0x16a0772b17ae004e6645e0e95bf50ad69498a34e";
-
-    impl External for DummyExternal {
-        fn storage_read(&mut self, key: &H256) -> Result<[u8; 32], Error> {
-            if let Some(value) = self.storage.get(key) {
-                Ok(value.clone())
-            } else {
-                Err(Error)
-            }
-        }
-        fn storage_write(&mut self, key: &H256, value: &[u8; 32]) -> Result<(), Error> {
-            self.storage.insert(*key, value.clone());
-            Ok(())
-        }
-        fn sender(&mut self) -> Address {
-            SENDER_ADDRESS.into()
-        }
-    }
-
     /// a builder for quick creation of External impls for testing.
     /// to be moved to pwasm_test later
     pub struct ExternalBuilder {
