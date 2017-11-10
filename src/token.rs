@@ -75,7 +75,6 @@ pub mod contract {
     pub struct TokenContractInstance;
 
     impl TokenContract for TokenContractInstance {
-
         /// A contract constructor implementation.
         fn constructor(&mut self, total_supply: U256) {
             let sender = ext::sender();
@@ -198,7 +197,7 @@ mod tests {
         totalSupply_should_return_total_supply_contract_was_initialized_with {
             let mut contract = TokenContractInstance{};
             let total_supply = 42.into();
-            contract.ctor(total_supply);
+            contract.constructor(total_supply);
             assert_eq!(contract.totalSupply(), total_supply);
         }
     );
@@ -210,7 +209,7 @@ mod tests {
             // set total supply to maximum value of an unsigned 256 bit integer
             let total_supply = U256::from_dec_str("115792089237316195423570985008687907853269984665640564039457584007913129639935").unwrap();
             assert_eq!(total_supply, U256::max_value());
-            contract.ctor(total_supply);
+            contract.constructor(total_supply);
             assert_eq!(contract.totalSupply(), total_supply);
         }
     );
@@ -220,7 +219,7 @@ mod tests {
         should_initially_give_the_total_supply_to_the_creator {
             let mut contract = TokenContractInstance{};
             let total_supply = 10000.into();
-            contract.ctor(total_supply);
+            contract.constructor(total_supply);
             assert_eq!(contract.balanceOf(Address::from(SENDER_ADDRESS)), total_supply);
         }
     );
