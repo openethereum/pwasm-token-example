@@ -13,7 +13,7 @@ extern crate pwasm_abi_derive;
 
 use pwasm_abi::eth::EndpointInterface;
 
-mod contract {
+pub mod contract {
     use alloc::borrow::Cow;
     use alloc::vec::Vec;
 
@@ -26,7 +26,6 @@ mod contract {
 
     use pwasm_abi_derive::eth_abi;
 
-    #[allow(non_snake_case)]
     // TokenContract is an interface definition of a contract.
     // The current example covers the minimal subset of ERC20 token standard.
     // eth_abi macro parses an interface (trait) definition of a contact and generates
@@ -47,7 +46,7 @@ mod contract {
     // ```
     // Will generate a Solidity-compatible call for the contract, deployed on `contactAddress`.
     // Then it invokes pwasm_std::ext::call on `contactAddress` and returns the result.
-
+    #[allow(non_snake_case)]
     #[eth_abi(Endpoint, Client)]
     pub trait TokenContract {
         fn ctor(&mut self, total_supply: U256);
@@ -74,7 +73,7 @@ mod contract {
     pub struct TokenContractInstance;
     #[allow(non_snake_case)]
     impl TokenContract for TokenContractInstance {
-        
+
         /// A contract constructor implementation.
         fn ctor(&mut self, total_supply: U256) {
             let sender = ext::sender();
@@ -85,12 +84,12 @@ mod contract {
             // Set the contract owner
             storage::write(&OWNER_KEY, &H256::from(sender).into()).unwrap();
         }
-        
+
         /// Returns the current balance for some address.
         fn balanceOf(&mut self, _owner: Address) -> U256 {
             balance_of(&_owner)
         }
-        
+
         /// Transfer funds
         fn transfer(&mut self, _to: Address, _amount: U256) -> bool {
             let sender = ext::sender();
@@ -106,7 +105,7 @@ mod contract {
                 true
             }
         }
-        
+
         /// Returns total amount of tokens
         fn totalSupply(&mut self) -> U256 {
             storage::read(&TOTAL_SUPPLY_KEY).unwrap_or([0u8; 32]).into()
