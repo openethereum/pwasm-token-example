@@ -1,0 +1,21 @@
+[package]
+name = "real_world"
+version = "0.1.0"
+authors = ["Sergey Pepyakin <s.pepyakin@gmail.com>"]
+
+[[test]]
+name = "real_world"
+path = "src/real_world.rs"
+
+[dependencies]
+wasm = { git = "https://github.com/paritytech/parity.git" }
+vm = { git = "https://github.com/paritytech/parity.git" }
+ethcore-bigint = { git = "https://github.com/paritytech/parity.git" }
+ethcore-logger = { git = "https://github.com/paritytech/parity.git" }
+byteorder = "1.0"
+
+# wasm = { path = "/Users/pepyakin/dev/parity/parity/ethcore/wasm", version = "0.1.0" }
+# vm = { path = "/Users/pepyakin/dev/parity/parity/ethcore/vm", version = "0.1.0" }
+# ethcore-bigint = { path = "/Users/pepyakin/dev/parity/parity/util/bigint", version = "0.2.1" }
+# ethcore-logger = { path = "/Users/pepyakin/dev/parity/parity/logger", version = "1.9.0" }
+# byteorder = "1.0"
