@@ -201,6 +201,7 @@ mod tests {
     }
 
     /// an implementation of External built with ExternalBuilder
+    #[derive(Clone)]
     pub struct BuiltExternal {
         storage: HashMap<H256, [u8; 32]>,
         sender: Address,
