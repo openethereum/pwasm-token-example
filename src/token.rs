@@ -142,6 +142,7 @@ extern crate pwasm_test;
 #[allow(non_snake_case)]
 mod tests {
     extern crate std;
+    use std::any::Any;
     use pwasm_test;
     use super::contract::*;
     use self::pwasm_test::{External, Error};
@@ -211,6 +212,26 @@ mod tests {
         fn sender(&mut self) -> Address {
             self.sender
         }
+        fn as_any(&self) -> &Any {
+            self
+        }
+    }
+
+    /// downcasts the external last set with `set_external` to the concrete
+    /// type `T` and returns a clone of it
+    fn get_external<T: External + Clone + 'static>() -> T {
+        // https://doc.rust-lang.org/std/thread/struct.LocalKey.html
+        self::pwasm_test::EXTERNAL.with(|arg| {
+            // https://doc.rust-lang.org/std/cell/struct.RefCell.html
+            let ref_cell: &std::cell::RefCell<Box<External>> = arg;
+            // https://doc.rust-lang.org/std/cell/struct.Ref.html
+            let ref_: std::cell::Ref<Box<External>> = ref_cell.borrow();
+
+            let any: &Any = ref_.as_any();
+            // https://doc.rust-lang.org/std/any/trait.Any.html
+            let downcasted: &T = any.downcast_ref().unwrap();
+            downcasted.clone()
+        })
     }
 
     test_with_external!(
