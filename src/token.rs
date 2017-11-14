@@ -289,4 +289,25 @@ mod tests {
                 total_supply);
         }
     );
+
+    #[test]
+    fn should_succeed_transfering_10000_from_owner_to_another_address() {
+        let mut contract = TokenContractInstance{};
+
+        let owner_address = Address::from("0xea674fdde714fd979de3edf0f56aa9716b898ec8");
+        let external = ExternalBuilder::new()
+            .sender(owner_address.clone())
+            .build();
+
+        self::pwasm_test::set_external(Box::new(external));
+
+        let total_supply = 10000.into();
+        contract.ctor(total_supply);
+
+        assert_eq!(contract.balanceOf(owner_address), total_supply);
+
+        let builder = ExternalBuilder::from_external(get_external::<BuiltExternal>());
+
+        let receiver_address = Address::from("0x0a3784db2d00f02916587aa35871e17f511b706c");
+    }
 }
