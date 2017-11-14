@@ -166,6 +166,15 @@ mod tests {
             }
         }
 
+        /// moves a BuiltExternal back into the build state
+        /// where it can be manipulated
+        pub fn from_external(external: BuiltExternal) -> ExternalBuilder {
+            ExternalBuilder {
+                storage: external.storage,
+                sender: external.sender,
+            }
+        }
+
         /// set the sender
         pub fn sender(mut self, sender: Address) -> Self {
             self.sender = sender;
