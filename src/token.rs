@@ -11,7 +11,9 @@ extern crate pwasm_std;
 extern crate pwasm_abi;
 extern crate pwasm_abi_derive;
 
-mod contract {
+use pwasm_abi::eth::EndpointInterface;
+
+pub mod contract {
     use alloc::borrow::Cow;
     use alloc::vec::Vec;
 
@@ -24,7 +26,6 @@ mod contract {
 
     use pwasm_abi_derive::eth_abi;
 
-    #[allow(non_snake_case)]
     // TokenContract is an interface definition of a contract.
     // The current example covers the minimal subset of ERC20 token standard.
     // eth_abi macro parses an interface (trait) definition of a contact and generates
@@ -45,7 +46,7 @@ mod contract {
     // ```
     // Will generate a Solidity-compatible call for the contract, deployed on `contactAddress`.
     // Then it invokes pwasm_std::ext::call on `contactAddress` and returns the result.
-
+    #[allow(non_snake_case)]
     #[eth_abi(Endpoint, Client)]
     pub trait TokenContract {
         fn ctor(&mut self, total_supply: U256);
@@ -75,6 +76,7 @@ mod contract {
     pub struct TokenContractInstance;
     #[allow(non_snake_case)]
     impl TokenContract for TokenContractInstance {
+
         /// A contract constructor implementation.
         fn ctor(&mut self, total_supply: U256) {
             let sender = ext::sender();
@@ -85,10 +87,12 @@ mod contract {
             // Set the contract owner
             storage::write(&OWNER_KEY, &H256::from(sender).into()).unwrap();
         }
+
         /// Returns the current balance for some address.
         fn balanceOf(&mut self, _owner: Address) -> U256 {
             balance_of(&_owner)
         }
+
         /// Transfer funds
         fn transfer(&mut self, to: Address, amount: U256) -> bool {
             let sender = ext::sender();
@@ -105,6 +109,7 @@ mod contract {
                 true
             }
         }
+
         /// Returns total amount of tokens
         fn totalSupply(&mut self) -> U256 {
             storage::read(&TOTAL_SUPPLY_KEY).unwrap_or([0u8; 32]).into()
@@ -145,18 +150,37 @@ mod tests {
     use pwasm_std::bigint::U256;
     use pwasm_std::hash::{Address, H256};
 
-    test_with_external!(
-        DummyExternal: impl External for DummyExternal {
-            fn storage(&mut self) -> HashMap<H256, [u8; 32]> {
-                let mut storage = HashMap::new();
-                storage.insert([1,0,0,0,0,0,0,0,0,0,0,0,
-                                31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31].into(), U256::from(100000).into());
-                storage
-            }
-            fn storage_write(&mut self, _key: &H256, _value: &[u8; 32]) -> Result<(), Error> {
-                Ok(())
+    struct DummyExternal {
+        storage: HashMap<H256, [u8; 32]>
+    }
+
+    impl DummyExternal {
+        fn new() -> Self {
+            let mut storage = HashMap::new();
+            storage.insert([1,0,0,0,0,0,0,0,0,0,0,0,
+                            31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31].into(), U256::from(100000).into());
+            DummyExternal {
+                storage: storage
             }
         }
+    }
+
+    impl External for DummyExternal {
+        fn storage_read(&mut self, key: &H256) -> Result<[u8; 32], Error> {
+            if let Some(value) = self.storage.get(key) {
+                Ok(value.clone())
+            } else {
+                Err(Error)
+            }
+        }
+        fn storage_write(&mut self, _key: &H256, _value: &[u8; 32]) -> Result<(), Error> {
+            // to be fleshed out
+            Ok(())
+        }
+    }
+
+    test_with_external!(
+        DummyExternal::new(),
         check_balance {
             let address = Address::from([31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31]);
             let mut contract = TokenContractInstance{};
