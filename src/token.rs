@@ -130,7 +130,7 @@ pub fn call(desc: *mut u8) {
 }
 
 #[no_mangle]
-pub fn create(desc: *mut u8) {
+pub fn deploy(desc: *mut u8) {
     let (args, _) = unsafe { pwasm_std::parse_args(desc) };
     let mut endpoint = contract::Endpoint::new(contract::TokenContractInstance{});
     endpoint.dispatch_ctor(&args);
