@@ -1,0 +1,14 @@
+[package]
+name = "pwasm-std-ext"
+version = "0.1.0"
+authors = ["Alexey Frolov <frol.rage@gmail.com>"]
+
+[dependencies]
+pwasm-std = { git = "https://github.com/paritytech/pwasm-std" }
+
+[profile.release]
+panic = "abort"
+lto = true
+
+[features]
+std = ["pwasm-std/std"]
