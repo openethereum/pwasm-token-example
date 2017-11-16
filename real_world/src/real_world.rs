@@ -64,3 +64,8 @@ fn simple_test() {
 
     assert_eq!(U256::from_big_endian(&result_data), total_supply);
 }
+
+#[test]
+fn transfer() {
+    
+}
