@@ -14,7 +14,7 @@ extern crate pwasm_abi_derive;
 use pwasm_abi::eth::EndpointInterface;
 
 pub mod contract {
-    use alloc::borrow::Cow;
+    #![allow(non_snake_case)]
     use alloc::vec::Vec;
 
     use pwasm_std::{storage, ext};
@@ -46,10 +46,9 @@ pub mod contract {
     // ```
     // Will generate a Solidity-compatible call for the contract, deployed on `contactAddress`.
     // Then it invokes pwasm_std::ext::call on `contactAddress` and returns the result.
-    #[allow(non_snake_case)]
     #[eth_abi(Endpoint, Client)]
     pub trait TokenContract {
-        fn ctor(&mut self, total_supply: U256);
+        fn constructor(&mut self, total_supply: U256);
         fn balanceOf(&mut self, _owner: Address) -> U256;
         fn transfer(&mut self, _to: Address, _amount: U256) -> bool;
         fn totalSupply(&mut self) -> U256;
@@ -74,11 +73,11 @@ pub mod contract {
     }
 
     pub struct TokenContractInstance;
-    #[allow(non_snake_case)]
+
     impl TokenContract for TokenContractInstance {
 
         /// A contract constructor implementation.
-        fn ctor(&mut self, total_supply: U256) {
+        fn constructor(&mut self, total_supply: U256) {
             let sender = ext::sender();
             // Set up the total supply for the token
             storage::write(&TOTAL_SUPPLY_KEY, &total_supply.into()).unwrap();
