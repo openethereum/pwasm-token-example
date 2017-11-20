@@ -61,7 +61,7 @@ pub mod contract {
     static OWNER_KEY: H256 = H256([3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 
     fn balance_of(owner: &Address) -> U256 {
-        storage::read(&balance_key(owner)).unwrap_or([0u8;32]).into()
+        storage::read(&balance_key(owner)).into()
     }
 
     // Generates a balance key for some address.
@@ -80,11 +80,11 @@ pub mod contract {
         fn constructor(&mut self, total_supply: U256) {
             let sender = ext::sender();
             // Set up the total supply for the token
-            storage::write(&TOTAL_SUPPLY_KEY, &total_supply.into()).unwrap();
+            storage::write(&TOTAL_SUPPLY_KEY, &total_supply.into());
             // Give all tokens to the contract owner
-            storage::write(&balance_key(&sender), &total_supply.into()).unwrap();
+            storage::write(&balance_key(&sender), &total_supply.into());
             // Set the contract owner
-            storage::write(&OWNER_KEY, &H256::from(sender).into()).unwrap();
+            storage::write(&OWNER_KEY, &H256::from(sender).into());
         }
 
         /// Returns the current balance for some address.
@@ -102,8 +102,8 @@ pub mod contract {
             } else {
                 senderBalance = senderBalance - amount;
                 recipientBalance = recipientBalance + amount;
-                storage::write(&balance_key(&sender), &senderBalance.into()).unwrap();
-                storage::write(&balance_key(&to), &recipientBalance.into()).unwrap();
+                storage::write(&balance_key(&sender), &senderBalance.into());
+                storage::write(&balance_key(&to), &recipientBalance.into());
                 self.Transfer(sender, to, amount);
                 true
             }
@@ -111,7 +111,7 @@ pub mod contract {
 
         /// Returns total amount of tokens
         fn totalSupply(&mut self) -> U256 {
-            storage::read(&TOTAL_SUPPLY_KEY).unwrap_or([0u8; 32]).into()
+            storage::read(&TOTAL_SUPPLY_KEY).into()
         }
     }
 }

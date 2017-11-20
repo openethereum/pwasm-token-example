@@ -15,6 +15,11 @@ version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "cfg-if"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "crunchy"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -55,10 +60,11 @@ dependencies = [
 [[package]]
 name = "pwasm-std"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/pwasm-std#fd4d082707cedbd70d287f66858297daf2927f6e"
+source = "git+https://github.com/paritytech/pwasm-std#b91ca39c640373ed215dcb9b7d5a0bdd112aa28f"
 dependencies = [
  "bigint 4.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "byteorder 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "cfg-if 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-hash 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tiny-keccak 1.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "wasm-alloc 0.1.0 (git+https://github.com/paritytech/pwasm-std)",
@@ -135,7 +141,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "wasm-alloc"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/pwasm-std#fd4d082707cedbd70d287f66858297daf2927f6e"
+source = "git+https://github.com/paritytech/pwasm-std#b91ca39c640373ed215dcb9b7d5a0bdd112aa28f"
 dependencies = [
  "wasm-libc 0.1.0 (git+https://github.com/paritytech/pwasm-std)",
 ]
@@ -143,7 +149,7 @@ dependencies = [
 [[package]]
 name = "wasm-libc"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/pwasm-std#fd4d082707cedbd70d287f66858297daf2927f6e"
+source = "git+https://github.com/paritytech/pwasm-std#b91ca39c640373ed215dcb9b7d5a0bdd112aa28f"
 
 [[package]]
 name = "wasm-token-example"
@@ -158,6 +164,7 @@ dependencies = [
 [metadata]
 "checksum bigint 4.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "5442186ef6560f30f1ee4b9c1e4c87a35a6879d3644550cc248ec2b955eb5fcd"
 "checksum byteorder 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ff81738b726f5d099632ceaffe7fb65b90212e8dce59d518729e7e8634032d3d"
+"checksum cfg-if 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "d4c819a1287eb618df47cc647173c5c4c66ba19d888a6e50d605672aed3140de"
 "checksum crunchy 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "a2f4a431c5c9f662e1200b7c7f02c34e91361150e382089a8f2dec3ba680cbda"
 "checksum parity-hash 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "fdd741c00934b85b6fe9d7520274962f2a73a12351c96b2ac938f68afad6b213"
 "checksum pwasm-abi 0.1.0 (git+https://github.com/paritytech/pwasm-abi)" = "<none>"
