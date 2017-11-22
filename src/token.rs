@@ -13,12 +13,8 @@ extern crate pwasm_abi_derive;
 
 use pwasm_abi::eth::EndpointInterface;
 
-<<<<<<< HEAD
 pub mod contract {
     #![allow(non_snake_case)]
-=======
-mod contract {
->>>>>>> Cargo.lock + warnings fixes, + pwasm-std update
     use alloc::vec::Vec;
 
     use pwasm_std::{storage, ext};
@@ -103,10 +99,10 @@ mod contract {
             if amount == 0.into() || senderBalance < amount {
                 false
             } else {
-                senderBalance = senderBalance - _amount;
-                recipientBalance = recipientBalance + _amount;
+                senderBalance = senderBalance - amount;
+                recipientBalance = recipientBalance + amount;
                 storage::write(&balance_key(&sender), &senderBalance.into());
-                storage::write(&balance_key(&_to), &recipientBalance.into());
+                storage::write(&balance_key(&to), &recipientBalance.into());
                 self.Transfer(sender, to, amount);
                 true
             }
@@ -191,7 +187,7 @@ mod tests {
         should_initially_give_the_total_supply_to_the_creator {
             let mut contract = TokenContractInstance{};
             let total_supply = 10000.into();
-            contract.ctor(total_supply);
+            contract.constructor(total_supply);
             assert_eq!(
                 contract.balanceOf(get_external::<ExternalInstance>().sender()),
                 total_supply);
@@ -210,7 +206,7 @@ mod tests {
         set_external(Box::new(external));
 
         let total_supply = 10000.into();
-        contract.ctor(total_supply);
+        contract.constructor(total_supply);
 
         assert_eq!(contract.balanceOf(owner_address), total_supply);
     }
