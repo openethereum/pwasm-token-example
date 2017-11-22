@@ -60,8 +60,8 @@ pub mod contract {
     static TOTAL_SUPPLY_KEY: H256 = H256([2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
     static OWNER_KEY: H256 = H256([3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 
-    fn balance_of(owner: &Address) -> U256 {
-        storage::read(&balance_key(owner)).unwrap_or([0u8;32]).into()
+    fn balance_of(_owner: &Address) -> U256 {
+        storage::read(&balance_key(_owner)).into()
     }
 
     // Generates a balance key for some address.
@@ -75,16 +75,15 @@ pub mod contract {
     pub struct TokenContractInstance;
 
     impl TokenContract for TokenContractInstance {
-
         /// A contract constructor implementation.
         fn constructor(&mut self, total_supply: U256) {
             let sender = ext::sender();
             // Set up the total supply for the token
-            storage::write(&TOTAL_SUPPLY_KEY, &total_supply.into()).unwrap();
+            storage::write(&TOTAL_SUPPLY_KEY, &total_supply.into());
             // Give all tokens to the contract owner
-            storage::write(&balance_key(&sender), &total_supply.into()).unwrap();
+            storage::write(&balance_key(&sender), &total_supply.into());
             // Set the contract owner
-            storage::write(&OWNER_KEY, &H256::from(sender).into()).unwrap();
+            storage::write(&OWNER_KEY, &H256::from(sender).into());
         }
 
         /// Returns the current balance for some address.
@@ -102,8 +101,8 @@ pub mod contract {
             } else {
                 senderBalance = senderBalance - amount;
                 recipientBalance = recipientBalance + amount;
-                storage::write(&balance_key(&sender), &senderBalance.into()).unwrap();
-                storage::write(&balance_key(&to), &recipientBalance.into()).unwrap();
+                storage::write(&balance_key(&sender), &senderBalance.into());
+                storage::write(&balance_key(&to), &recipientBalance.into());
                 self.Transfer(sender, to, amount);
                 true
             }
@@ -111,7 +110,7 @@ pub mod contract {
 
         /// Returns total amount of tokens
         fn totalSupply(&mut self) -> U256 {
-            storage::read(&TOTAL_SUPPLY_KEY).unwrap_or([0u8; 32]).into()
+            storage::read(&TOTAL_SUPPLY_KEY).into()
         }
     }
 }
@@ -140,50 +139,75 @@ pub fn deploy(desc: *mut u8) {
 extern crate pwasm_test;
 
 #[cfg(test)]
+#[allow(non_snake_case)]
 mod tests {
     extern crate std;
     use pwasm_test;
     use super::contract::*;
-    use self::pwasm_test::{External, Error};
-    use self::std::collections::HashMap;
+    use self::pwasm_test::{External, ExternalBuilder, ExternalInstance, get_external, set_external};
     use pwasm_std::bigint::U256;
-    use pwasm_std::hash::{Address, H256};
-
-    struct DummyExternal {
-        storage: HashMap<H256, [u8; 32]>
-    }
-
-    impl DummyExternal {
-        fn new() -> Self {
-            let mut storage = HashMap::new();
-            storage.insert([1,0,0,0,0,0,0,0,0,0,0,0,
-                            31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31].into(), U256::from(100000).into());
-            DummyExternal {
-                storage: storage
-            }
-        }
-    }
-
-    impl External for DummyExternal {
-        fn storage_read(&mut self, key: &H256) -> Result<[u8; 32], Error> {
-            if let Some(value) = self.storage.get(key) {
-                Ok(value.clone())
-            } else {
-                Err(Error)
-            }
-        }
-        fn storage_write(&mut self, _key: &H256, _value: &[u8; 32]) -> Result<(), Error> {
-            // to be fleshed out
-            Ok(())
-        }
-    }
+    use pwasm_std::hash::{Address};
 
     test_with_external!(
-        DummyExternal::new(),
-        check_balance {
+        ExternalBuilder::new()
+            .storage([1,0,0,0,0,0,0,0,0,0,0,0,
+                            31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31].into(), U256::from(100000).into())
+            .build(),
+        balanceOf_should_return_balance {
             let address = Address::from([31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31]);
             let mut contract = TokenContractInstance{};
             assert_eq!(contract.balanceOf(address), 100000.into())
         }
     );
+
+    test_with_external!(
+        ExternalBuilder::new().build(),
+        totalSupply_should_return_total_supply_contract_was_initialized_with {
+            let mut contract = TokenContractInstance{};
+            let total_supply = 42.into();
+            contract.constructor(total_supply);
+            assert_eq!(contract.totalSupply(), total_supply);
+        }
+    );
+
+    test_with_external!(
+        ExternalBuilder::new().build(),
+        should_succeed_in_creating_max_possible_amount_of_tokens {
+            let mut contract = TokenContractInstance{};
+            // set total supply to maximum value of an unsigned 256 bit integer
+            let total_supply = U256::from_dec_str("115792089237316195423570985008687907853269984665640564039457584007913129639935").unwrap();
+            assert_eq!(total_supply, U256::max_value());
+            contract.constructor(total_supply);
+            assert_eq!(contract.totalSupply(), total_supply);
+        }
+    );
+
+    test_with_external!(
+        ExternalBuilder::new().build(),
+        should_initially_give_the_total_supply_to_the_creator {
+            let mut contract = TokenContractInstance{};
+            let total_supply = 10000.into();
+            contract.constructor(total_supply);
+            assert_eq!(
+                contract.balanceOf(get_external::<ExternalInstance>().sender()),
+                total_supply);
+        }
+    );
+
+    #[test]
+    fn should_succeed_transfering_10000_from_owner_to_another_address() {
+        let mut contract = TokenContractInstance{};
+
+        let owner_address = Address::from("0xea674fdde714fd979de3edf0f56aa9716b898ec8");
+        let external = ExternalBuilder::new()
+            .sender(owner_address.clone())
+            .build();
+
+        set_external(Box::new(external));
+
+        let total_supply = 10000.into();
+        contract.constructor(total_supply);
+
+        assert_eq!(contract.balanceOf(owner_address), total_supply);
+    }
 }
