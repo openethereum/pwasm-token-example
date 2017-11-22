@@ -15,6 +15,11 @@ version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "cfg-if"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "crunchy"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -31,7 +36,7 @@ dependencies = [
 [[package]]
 name = "pwasm-abi"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/pwasm-abi#a6e0610534e41c635db7ff181264be0caa0434e3"
+source = "git+https://github.com/paritytech/pwasm-abi#22f03bcd4e57d8ae14653b62f7d3dd98caa39250"
 dependencies = [
  "bigint 4.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "byteorder 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -42,7 +47,7 @@ dependencies = [
 [[package]]
 name = "pwasm-abi-derive"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/pwasm-abi#a6e0610534e41c635db7ff181264be0caa0434e3"
+source = "git+https://github.com/paritytech/pwasm-abi#22f03bcd4e57d8ae14653b62f7d3dd98caa39250"
 dependencies = [
  "byteorder 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-hash 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -53,24 +58,38 @@ dependencies = [
 ]
 
 [[package]]
-name = "pwasm-std"
+name = "pwasm-alloc"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/pwasm-std#fd4d082707cedbd70d287f66858297daf2927f6e"
+source = "git+https://github.com/paritytech/pwasm-std#af3e040b0fd0ee748f1ed2700aaa9487f8f9fc70"
+dependencies = [
+ "pwasm-libc 0.1.0 (git+https://github.com/paritytech/pwasm-std)",
+]
+
+[[package]]
+name = "pwasm-libc"
+version = "0.1.0"
+source = "git+https://github.com/paritytech/pwasm-std#af3e040b0fd0ee748f1ed2700aaa9487f8f9fc70"
+
+[[package]]
+name = "pwasm-std"
+version = "0.1.1"
+source = "git+https://github.com/paritytech/pwasm-std#af3e040b0fd0ee748f1ed2700aaa9487f8f9fc70"
 dependencies = [
  "bigint 4.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "byteorder 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "cfg-if 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-hash 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pwasm-alloc 0.1.0 (git+https://github.com/paritytech/pwasm-std)",
+ "pwasm-libc 0.1.0 (git+https://github.com/paritytech/pwasm-std)",
  "tiny-keccak 1.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "wasm-alloc 0.1.0 (git+https://github.com/paritytech/pwasm-std)",
- "wasm-libc 0.1.0 (git+https://github.com/paritytech/pwasm-std)",
 ]
 
 [[package]]
 name = "pwasm-test"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/pwasm-test#ae92c6e90d504b5aa3bc6dd1f8c98863251b137f"
+source = "git+https://github.com/paritytech/pwasm-test#35065c18edbaf269a42bd7d998d1ce4e24e64e7b"
 dependencies = [
- "pwasm-std 0.1.0 (git+https://github.com/paritytech/pwasm-std)",
+ "pwasm-std 0.1.1 (git+https://github.com/paritytech/pwasm-std)",
 ]
 
 [[package]]
@@ -133,36 +152,26 @@ version = "0.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
-name = "wasm-alloc"
-version = "0.1.0"
-source = "git+https://github.com/paritytech/pwasm-std#fd4d082707cedbd70d287f66858297daf2927f6e"
-dependencies = [
- "wasm-libc 0.1.0 (git+https://github.com/paritytech/pwasm-std)",
-]
-
-[[package]]
-name = "wasm-libc"
-version = "0.1.0"
-source = "git+https://github.com/paritytech/pwasm-std#fd4d082707cedbd70d287f66858297daf2927f6e"
-
-[[package]]
 name = "wasm-token-example"
 version = "0.1.0"
 dependencies = [
  "pwasm-abi 0.1.0 (git+https://github.com/paritytech/pwasm-abi)",
  "pwasm-abi-derive 0.1.0 (git+https://github.com/paritytech/pwasm-abi)",
- "pwasm-std 0.1.0 (git+https://github.com/paritytech/pwasm-std)",
+ "pwasm-std 0.1.1 (git+https://github.com/paritytech/pwasm-std)",
  "pwasm-test 0.1.0 (git+https://github.com/paritytech/pwasm-test)",
 ]
 
 [metadata]
 "checksum bigint 4.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "5442186ef6560f30f1ee4b9c1e4c87a35a6879d3644550cc248ec2b955eb5fcd"
 "checksum byteorder 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ff81738b726f5d099632ceaffe7fb65b90212e8dce59d518729e7e8634032d3d"
+"checksum cfg-if 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "d4c819a1287eb618df47cc647173c5c4c66ba19d888a6e50d605672aed3140de"
 "checksum crunchy 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "a2f4a431c5c9f662e1200b7c7f02c34e91361150e382089a8f2dec3ba680cbda"
 "checksum parity-hash 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "fdd741c00934b85b6fe9d7520274962f2a73a12351c96b2ac938f68afad6b213"
 "checksum pwasm-abi 0.1.0 (git+https://github.com/paritytech/pwasm-abi)" = "<none>"
 "checksum pwasm-abi-derive 0.1.0 (git+https://github.com/paritytech/pwasm-abi)" = "<none>"
-"checksum pwasm-std 0.1.0 (git+https://github.com/paritytech/pwasm-std)" = "<none>"
+"checksum pwasm-alloc 0.1.0 (git+https://github.com/paritytech/pwasm-std)" = "<none>"
+"checksum pwasm-libc 0.1.0 (git+https://github.com/paritytech/pwasm-std)" = "<none>"
+"checksum pwasm-std 0.1.1 (git+https://github.com/paritytech/pwasm-std)" = "<none>"
 "checksum pwasm-test 0.1.0 (git+https://github.com/paritytech/pwasm-test)" = "<none>"
 "checksum quote 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)" = "7a6e920b65c65f10b2ae65c831a81a073a89edd28c7cce89475bff467ab4167a"
 "checksum rustc-hex 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "0ceb8ce7a5e520de349e1fa172baeba4a9e8d5ef06c47471863530bc4972ee1e"
@@ -173,5 +182,3 @@ dependencies = [
 "checksum synom 0.11.3 (registry+https://github.com/rust-lang/crates.io-index)" = "a393066ed9010ebaed60b9eafa373d4b1baac186dd7e008555b0f702b51945b6"
 "checksum tiny-keccak 1.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "d52d12ad79e4063e0cb0ca5efa202ed7244b6ce4d25f4d3abe410b2a66128292"
 "checksum unicode-xid 0.0.4 (registry+https://github.com/rust-lang/crates.io-index)" = "8c1f860d7d29cf02cb2f3f359fd35991af3d30bac52c57d265a3c461074cb4dc"
-"checksum wasm-alloc 0.1.0 (git+https://github.com/paritytech/pwasm-std)" = "<none>"
-"checksum wasm-libc 0.1.0 (git+https://github.com/paritytech/pwasm-std)" = "<none>"

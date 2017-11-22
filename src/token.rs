@@ -13,8 +13,12 @@ extern crate pwasm_abi_derive;
 
 use pwasm_abi::eth::EndpointInterface;
 
+<<<<<<< HEAD
 pub mod contract {
     #![allow(non_snake_case)]
+=======
+mod contract {
+>>>>>>> Cargo.lock + warnings fixes, + pwasm-std update
     use alloc::vec::Vec;
 
     use pwasm_std::{storage, ext};
@@ -60,8 +64,8 @@ pub mod contract {
     static TOTAL_SUPPLY_KEY: H256 = H256([2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
     static OWNER_KEY: H256 = H256([3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 
-    fn balance_of(owner: &Address) -> U256 {
-        storage::read(&balance_key(owner)).unwrap_or([0u8;32]).into()
+    fn balance_of(_owner: &Address) -> U256 {
+        storage::read(&balance_key(_owner)).into()
     }
 
     // Generates a balance key for some address.
@@ -79,11 +83,11 @@ pub mod contract {
         fn constructor(&mut self, total_supply: U256) {
             let sender = ext::sender();
             // Set up the total supply for the token
-            storage::write(&TOTAL_SUPPLY_KEY, &total_supply.into()).unwrap();
+            storage::write(&TOTAL_SUPPLY_KEY, &total_supply.into());
             // Give all tokens to the contract owner
-            storage::write(&balance_key(&sender), &total_supply.into()).unwrap();
+            storage::write(&balance_key(&sender), &total_supply.into());
             // Set the contract owner
-            storage::write(&OWNER_KEY, &H256::from(sender).into()).unwrap();
+            storage::write(&OWNER_KEY, &H256::from(sender).into());
         }
 
         /// Returns the current balance for some address.
@@ -99,10 +103,10 @@ pub mod contract {
             if amount == 0.into() || senderBalance < amount {
                 false
             } else {
-                senderBalance = senderBalance - amount;
-                recipientBalance = recipientBalance + amount;
-                storage::write(&balance_key(&sender), &senderBalance.into()).unwrap();
-                storage::write(&balance_key(&to), &recipientBalance.into()).unwrap();
+                senderBalance = senderBalance - _amount;
+                recipientBalance = recipientBalance + _amount;
+                storage::write(&balance_key(&sender), &senderBalance.into());
+                storage::write(&balance_key(&_to), &recipientBalance.into());
                 self.Transfer(sender, to, amount);
                 true
             }
@@ -110,7 +114,7 @@ pub mod contract {
 
         /// Returns total amount of tokens
         fn totalSupply(&mut self) -> U256 {
-            storage::read(&TOTAL_SUPPLY_KEY).unwrap_or([0u8; 32]).into()
+            storage::read(&TOTAL_SUPPLY_KEY).into()
         }
     }
 }
@@ -142,111 +146,15 @@ extern crate pwasm_test;
 #[allow(non_snake_case)]
 mod tests {
     extern crate std;
-    use std::any::Any;
     use pwasm_test;
     use super::contract::*;
-    use self::pwasm_test::{External, Error};
-    use self::std::collections::HashMap;
+    use self::pwasm_test::{External, ExternalBuilder, ExternalInstance, get_external, set_external};
     use pwasm_std::bigint::U256;
-    use pwasm_std::hash::{Address, H256};
-
-    /// a builder for quick creation of External impls for testing.
-    /// to be moved to pwasm_test later
-    pub struct ExternalBuilder {
-        storage: HashMap<H256, [u8; 32]>,
-        sender: Address,
-    }
-
-    impl ExternalBuilder {
-        /// begin build process
-        pub fn new() -> Self {
-            ExternalBuilder {
-                storage: HashMap::new(),
-                sender: ExternalBuilder::default_sender(),
-            }
-        }
-
-        /// moves a BuiltExternal back into the build state
-        /// where it can be manipulated
-        pub fn from_external(external: BuiltExternal) -> ExternalBuilder {
-            ExternalBuilder {
-                storage: external.storage,
-                sender: external.sender,
-            }
-        }
-
-        /// set the sender
-        pub fn sender(mut self, sender: Address) -> Self {
-            self.sender = sender;
-            self
-        }
-
-        /// write into storage
-        fn storage_write(mut self, key: H256, value: [u8; 32]) -> Self {
-            self.storage.insert(key, value);
-            self
-        }
-
-        /// end build process
-        pub fn build(self) -> BuiltExternal {
-            BuiltExternal {
-                storage: self.storage,
-                sender: self.sender,
-            }
-        }
-
-        pub fn default_sender() -> Address {
-            "0x16a0772b17ae004e6645e0e95bf50ad69498a34e".into()
-        }
-    }
-
-    /// an implementation of External built with ExternalBuilder
-    #[derive(Clone)]
-    pub struct BuiltExternal {
-        storage: HashMap<H256, [u8; 32]>,
-        sender: Address,
-    }
-
-    impl External for BuiltExternal {
-        fn storage_read(&mut self, key: &H256) -> Result<[u8; 32], Error> {
-            if let Some(value) = self.storage.get(key) {
-                Ok(value.clone())
-            } else {
-                Err(Error)
-            }
-        }
-        fn storage_write(&mut self, key: &H256, value: &[u8; 32]) -> Result<(), Error> {
-            self.storage.insert(*key, value.clone());
-            Ok(())
-        }
-        fn sender(&mut self) -> Address {
-            self.sender
-        }
-        fn as_any(&self) -> &Any {
-            self
-        }
-    }
-
-    /// downcasts the external last set with `set_external` to the concrete
-    /// type `T` and returns a clone of it
-    fn get_external<T: External + Clone + 'static>() -> T {
-        // https://doc.rust-lang.org/std/thread/struct.LocalKey.html
-        self::pwasm_test::EXTERNAL.with(|arg| {
-            // https://doc.rust-lang.org/std/cell/struct.RefCell.html
-            let ref_cell: &std::cell::RefCell<Box<External>> = arg;
-            // https://doc.rust-lang.org/std/cell/struct.Ref.html
-            let ref_: std::cell::Ref<Box<External>> = ref_cell.borrow();
-
-            let any: &Any = ref_.as_any();
-            // https://doc.rust-lang.org/std/any/trait.Any.html
-            let downcasted: &T = any.downcast_ref().unwrap();
-            downcasted.clone()
-        })
-    }
+    use pwasm_std::hash::{Address};
 
     test_with_external!(
         ExternalBuilder::new()
-            .storage_write([1,0,0,0,0,0,0,0,0,0,0,0,
+            .storage([1,0,0,0,0,0,0,0,0,0,0,0,
                             31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31].into(), U256::from(100000).into())
             .build(),
         balanceOf_should_return_balance {
@@ -285,7 +193,7 @@ mod tests {
             let total_supply = 10000.into();
             contract.ctor(total_supply);
             assert_eq!(
-                contract.balanceOf(ExternalBuilder::default_sender()),
+                contract.balanceOf(get_external::<ExternalInstance>().sender()),
                 total_supply);
         }
     );
@@ -299,15 +207,11 @@ mod tests {
             .sender(owner_address.clone())
             .build();
 
-        self::pwasm_test::set_external(Box::new(external));
+        set_external(Box::new(external));
 
         let total_supply = 10000.into();
         contract.ctor(total_supply);
 
         assert_eq!(contract.balanceOf(owner_address), total_supply);
-
-        let builder = ExternalBuilder::from_external(get_external::<BuiltExternal>());
-
-        let receiver_address = Address::from("0x0a3784db2d00f02916587aa35871e17f511b706c");
     }
 }
