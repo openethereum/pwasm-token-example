@@ -11,4 +11,4 @@ script:
   - cargo test --features std
   - docker exec -it emscripten sh -c "cargo install --git https://github.com/paritytech/wasm-utils wasm-build"
   - docker exec -it emscripten sh -c "./build.sh"
-  - docker exec -it emscripten sh -c "cargo test --manifest-path=./real_world/Cargo.toml"
+  - docker exec -it emscripten sh -c "RUST_LOG=wasm cargo test --manifest-path=./real_world/Cargo.toml"
