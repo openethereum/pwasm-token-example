@@ -36,7 +36,7 @@ dependencies = [
 [[package]]
 name = "pwasm-abi"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/pwasm-abi#22f03bcd4e57d8ae14653b62f7d3dd98caa39250"
+source = "git+https://github.com/paritytech/pwasm-abi#3b1786aeeb4c1e86e9b1017259c0f80e4ac2bdff"
 dependencies = [
  "bigint 4.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "byteorder 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -47,7 +47,7 @@ dependencies = [
 [[package]]
 name = "pwasm-abi-derive"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/pwasm-abi#22f03bcd4e57d8ae14653b62f7d3dd98caa39250"
+source = "git+https://github.com/paritytech/pwasm-abi#3b1786aeeb4c1e86e9b1017259c0f80e4ac2bdff"
 dependencies = [
  "byteorder 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-hash 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -72,7 +72,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "pwasm-std"
-version = "0.1.2"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "bigint 4.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -87,9 +87,9 @@ dependencies = [
 [[package]]
 name = "pwasm-test"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/pwasm-test#bf7c6c3243f8b79bf5a749b49819a07620f9bafb"
+source = "git+https://github.com/paritytech/pwasm-test#d34e681e908ade836fc96e7eea3ab23151651b77"
 dependencies = [
- "pwasm-std 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pwasm-std 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -157,7 +157,7 @@ version = "0.1.0"
 dependencies = [
  "pwasm-abi 0.1.0 (git+https://github.com/paritytech/pwasm-abi)",
  "pwasm-abi-derive 0.1.0 (git+https://github.com/paritytech/pwasm-abi)",
- "pwasm-std 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pwasm-std 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pwasm-test 0.1.0 (git+https://github.com/paritytech/pwasm-test)",
 ]
 
@@ -171,7 +171,7 @@ dependencies = [
 "checksum pwasm-abi-derive 0.1.0 (git+https://github.com/paritytech/pwasm-abi)" = "<none>"
 "checksum pwasm-alloc 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "7a61e7a9bfd7bdf92cde93dc7f4d53aad318ffefb46b96b57458ddffe49a1357"
 "checksum pwasm-libc 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "160a70ad233b97bce3ee47e3d18bbf9aaf7f9985f59cd2b0718b26193811e6cd"
-"checksum pwasm-std 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "5df79740ab9108bdfcef6a0cac82565f11574ca87b417d18e9efec6408794264"
+"checksum pwasm-std 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "3efb8d5871c967b23838649b804a3a91ad88837ca2d5dc570fd1fe2bd8ca31c5"
 "checksum pwasm-test 0.1.0 (git+https://github.com/paritytech/pwasm-test)" = "<none>"
 "checksum quote 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)" = "7a6e920b65c65f10b2ae65c831a81a073a89edd28c7cce89475bff467ab4167a"
 "checksum rustc-hex 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "0ceb8ce7a5e520de349e1fa172baeba4a9e8d5ef06c47471863530bc4972ee1e"

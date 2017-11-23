@@ -21,9 +21,6 @@ pub mod contract {
     use pwasm_std::hash::{Address, H256};
     use pwasm_std::bigint::U256;
 
-    // Following imports are used by generated eth_abi code
-    use pwasm_std::ext::{call, log};
-
     use pwasm_abi_derive::eth_abi;
 
     // TokenContract is an interface definition of a contract.
