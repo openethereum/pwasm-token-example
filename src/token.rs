@@ -217,4 +217,13 @@ mod tests {
         assert_eq!(contract.balanceOf(owner_address), 9000.into());
         assert_eq!(contract.balanceOf(sam_address), 1000.into());
     }
+
+    #[test]
+    fn should_return_false_transfer_not_sufficient_funds() {
+        set_external(Box::new(ExternalBuilder::new()
+            .build()));
+        let mut contract = TokenContractInstance{};
+        contract.constructor(10000.into());
+        assert_eq!(contract.transfer("0xdb6fd484cfa46eeeb73c71edee823e4812f9e2e1".into(), 50000.into()), false);
+    }
 }
