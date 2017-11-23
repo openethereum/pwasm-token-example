@@ -206,7 +206,8 @@ mod tests {
         contract.constructor(total_supply);
 
         assert_eq!(contract.balanceOf(owner_address), total_supply);
-        contract.transfer(sam_address, 1000.into());
+
+        assert_eq!(contract.transfer(sam_address, 1000.into()), true);
         assert_eq!(get_external::<ExternalInstance>().logs().len(), 1);
         assert_eq!(get_external::<ExternalInstance>().logs()[0].topics.as_ref(), &[
             "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef".into(),
@@ -225,5 +226,7 @@ mod tests {
         let mut contract = TokenContractInstance{};
         contract.constructor(10000.into());
         assert_eq!(contract.transfer("0xdb6fd484cfa46eeeb73c71edee823e4812f9e2e1".into(), 50000.into()), false);
+        assert_eq!(contract.balanceOf(::pwasm_std::ext::sender()), 10000.into());
+        assert_eq!(contract.balanceOf("0xdb6fd484cfa46eeeb73c71edee823e4812f9e2e1".into()), 0.into());
     }
 }
