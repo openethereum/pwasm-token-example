@@ -21,9 +21,6 @@ pub mod contract {
     use pwasm_std::hash::{Address, H256};
     use pwasm_std::bigint::U256;
 
-    // Following imports are used by generated eth_abi code
-    use pwasm_std::ext::{call, log};
-
     use pwasm_abi_derive::eth_abi;
 
     // TokenContract is an interface definition of a contract.
@@ -195,19 +192,41 @@ mod tests {
     );
 
     #[test]
-    fn should_succeed_transfering_10000_from_owner_to_another_address() {
+    fn should_succeed_transfering_1000_from_owner_to_another_address() {
         let mut contract = TokenContractInstance{};
 
         let owner_address = Address::from("0xea674fdde714fd979de3edf0f56aa9716b898ec8");
-        let external = ExternalBuilder::new()
-            .sender(owner_address.clone())
-            .build();
+        let sam_address = Address::from("0xdb6fd484cfa46eeeb73c71edee823e4812f9e2e1");
 
-        set_external(Box::new(external));
+        set_external(Box::new(ExternalBuilder::new()
+            .sender(owner_address.clone())
+            .build()));
 
         let total_supply = 10000.into();
         contract.constructor(total_supply);
 
         assert_eq!(contract.balanceOf(owner_address), total_supply);
+
+        assert_eq!(contract.transfer(sam_address, 1000.into()), true);
+        assert_eq!(get_external::<ExternalInstance>().logs().len(), 1);
+        assert_eq!(get_external::<ExternalInstance>().logs()[0].topics.as_ref(), &[
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef".into(),
+            "0x000000000000000000000000ea674fdde714fd979de3edf0f56aa9716b898ec8".into(),
+            "0x000000000000000000000000db6fd484cfa46eeeb73c71edee823e4812f9e2e1".into()]);
+        assert_eq!(get_external::<ExternalInstance>().logs()[0].data.as_ref(), &[
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 232]);
+        assert_eq!(contract.balanceOf(owner_address), 9000.into());
+        assert_eq!(contract.balanceOf(sam_address), 1000.into());
+    }
+
+    #[test]
+    fn should_return_false_transfer_not_sufficient_funds() {
+        set_external(Box::new(ExternalBuilder::new()
+            .build()));
+        let mut contract = TokenContractInstance{};
+        contract.constructor(10000.into());
+        assert_eq!(contract.transfer("0xdb6fd484cfa46eeeb73c71edee823e4812f9e2e1".into(), 50000.into()), false);
+        assert_eq!(contract.balanceOf(::pwasm_std::ext::sender()), 10000.into());
+        assert_eq!(contract.balanceOf("0xdb6fd484cfa46eeeb73c71edee823e4812f9e2e1".into()), 0.into());
     }
 }
