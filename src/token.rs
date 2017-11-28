@@ -6,6 +6,7 @@
 #![cfg_attr(not(feature="std"), no_main)]
 #![cfg_attr(not(feature="std"), no_std)]
 
+extern crate tiny_keccak;
 extern crate alloc;
 extern crate pwasm_std;
 extern crate pwasm_abi;
@@ -17,9 +18,11 @@ pub mod contract {
     #![allow(non_snake_case)]
     use alloc::vec::Vec;
 
+    use tiny_keccak::Keccak;
     use pwasm_std::{storage, ext};
     use pwasm_std::hash::{Address, H256};
     use pwasm_std::bigint::U256;
+    use pwasm_std::keccak;
 
     use pwasm_abi_derive::eth_abi;
 
@@ -45,10 +48,13 @@ pub mod contract {
     // Then it invokes pwasm_std::ext::call on `contactAddress` and returns the result.
     #[eth_abi(Endpoint, Client)]
     pub trait TokenContract {
-        fn constructor(&mut self, total_supply: U256);
+        fn constructor(&mut self, _total_supply: U256);
         fn balanceOf(&mut self, _owner: Address) -> U256;
         fn transfer(&mut self, _to: Address, _amount: U256) -> bool;
         fn totalSupply(&mut self) -> U256;
+        fn transferFrom(&mut self, _from: Address, _to: Address, _amount: U256) -> bool;
+        //fn approve(&mut self, _spender: Address, _value: U256) -> bool;
+        fn allowance(&mut self, _owner: Address, _spender: Address) -> U256;
 
         #[event]
         fn Transfer(&mut self, indexed_from: Address, indexed_to: Address, value: U256);
@@ -59,6 +65,16 @@ pub mod contract {
 
     fn balance_of(_owner: &Address) -> U256 {
         storage::read(&balance_key(_owner)).into()
+    }
+
+    fn allowance_key(owner: &Address, spender: &Address) -> H256 {
+        let mut keccak = Keccak::new_keccak256();
+        let mut res = H256::new();
+        keccak.update("allowance_key".as_ref());
+        keccak.update(owner.as_ref());
+        keccak.update(spender.as_ref());
+        keccak.finalize(&mut res);
+        res
     }
 
     // Generates a balance key for some address.
@@ -91,16 +107,34 @@ pub mod contract {
         /// Transfer funds
         fn transfer(&mut self, to: Address, amount: U256) -> bool {
             let sender = ext::sender();
-            let mut senderBalance = balance_of(&sender);
-            let mut recipientBalance = balance_of(&to);
+            let senderBalance = balance_of(&sender);
+            let recipientBalance = balance_of(&to);
             if amount == 0.into() || senderBalance < amount {
                 false
             } else {
-                senderBalance = senderBalance - amount;
-                recipientBalance = recipientBalance + amount;
-                storage::write(&balance_key(&sender), &senderBalance.into());
-                storage::write(&balance_key(&to), &recipientBalance.into());
+                storage::write(&balance_key(&sender), &(senderBalance - amount).into());
+                storage::write(&balance_key(&to), &(recipientBalance + amount).into());
                 self.Transfer(sender, to, amount);
+                true
+            }
+        }
+
+        fn allowance(&mut self, owner: Address, spender: Address) -> U256 {
+            storage::read(&allowance_key(&owner, &spender)).into()
+        }
+
+        fn transferFrom(&mut self, from: Address, to: Address, amount: U256) -> bool {
+            let fromBalance = balance_of(&from);
+            let recipientBalance = balance_of(&to);
+            let a_key = allowance_key(&from, &to);
+            let allowed = storage::read(&a_key).into();
+            if  allowed < amount || amount == 0.into() || fromBalance < amount {
+                false
+            } else {
+                storage::write(&a_key, &(allowed - amount.into());
+                storage::write(&balance_key(&from), &(fromBalance - amount).into());
+                storage::write(&balance_key(&to), &(recipientBalance + amount).into());
+                self.Transfer(from, to, amount);
                 true
             }
         }
