@@ -22,7 +22,6 @@ pub mod contract {
     use pwasm_std::{storage, ext};
     use pwasm_std::hash::{Address, H256};
     use pwasm_std::bigint::U256;
-    use pwasm_std::keccak;
 
     use pwasm_abi_derive::eth_abi;
 
@@ -63,8 +62,13 @@ pub mod contract {
     static TOTAL_SUPPLY_KEY: H256 = H256([2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
     static OWNER_KEY: H256 = H256([3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 
-    fn balance_of(_owner: &Address) -> U256 {
+
+    fn read_balance_of(_owner: &Address) -> U256 {
         storage::read(&balance_key(_owner)).into()
+    }
+
+    fn read_allowance(key: &H256) -> U256 {
+        storage::read(&key).into()
     }
 
     fn allowance_key(owner: &Address, spender: &Address) -> H256 {
@@ -101,14 +105,14 @@ pub mod contract {
 
         /// Returns the current balance for some address.
         fn balanceOf(&mut self, owner: Address) -> U256 {
-            balance_of(&owner)
+            read_balance_of(&owner)
         }
 
         /// Transfer funds
         fn transfer(&mut self, to: Address, amount: U256) -> bool {
             let sender = ext::sender();
-            let senderBalance = balance_of(&sender);
-            let recipientBalance = balance_of(&to);
+            let senderBalance = read_balance_of(&sender);
+            let recipientBalance = read_balance_of(&to);
             if amount == 0.into() || senderBalance < amount {
                 false
             } else {
@@ -124,14 +128,14 @@ pub mod contract {
         }
 
         fn transferFrom(&mut self, from: Address, to: Address, amount: U256) -> bool {
-            let fromBalance = balance_of(&from);
-            let recipientBalance = balance_of(&to);
+            let fromBalance = read_balance_of(&from);
+            let recipientBalance = read_balance_of(&to);
             let a_key = allowance_key(&from, &to);
-            let allowed = storage::read(&a_key).into();
+            let allowed = read_allowance(&a_key);
             if  allowed < amount || amount == 0.into() || fromBalance < amount {
                 false
             } else {
-                storage::write(&a_key, &(allowed - amount.into());
+                storage::write(&a_key, &(allowed - amount).into());
                 storage::write(&balance_key(&from), &(fromBalance - amount).into());
                 storage::write(&balance_key(&to), &(recipientBalance + amount).into());
                 self.Transfer(from, to, amount);
