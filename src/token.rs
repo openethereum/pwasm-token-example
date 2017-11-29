@@ -68,7 +68,7 @@ pub mod contract {
         /// If this function is called again it overwrites the current allowance with _value.
         fn approve(&mut self, _spender: Address, _value: U256) -> bool;
 
-        /// Check amount of tokens spender have right to spend on behalf of owner
+        /// Check the amount of tokens spender have right to spend on behalf of owner
         fn allowance(&mut self, _owner: Address, _spender: Address) -> U256;
 
         #[event]
@@ -151,7 +151,7 @@ pub mod contract {
 
         fn approve(&mut self, spender: Address, value: U256) -> bool {
             write_allowance(&allowance_key(&ext::sender(), &spender), value);
-            self.Approval(ext::sender(), spender, _value: U256);
+            self.Approval(ext::sender(), spender, value);
             true
         }
 
@@ -280,9 +280,9 @@ mod tests {
         assert_eq!(contract.transfer(sam_address, 1000.into()), true);
         assert_eq!(get_external::<ExternalInstance>().logs().len(), 1);
         assert_eq!(get_external::<ExternalInstance>().logs()[0].topics.as_ref(), &[
-            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef".into(),
-            "0x000000000000000000000000ea674fdde714fd979de3edf0f56aa9716b898ec8".into(),
-            "0x000000000000000000000000db6fd484cfa46eeeb73c71edee823e4812f9e2e1".into()]);
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef".into(), // hash of the event name
+            "0x000000000000000000000000ea674fdde714fd979de3edf0f56aa9716b898ec8".into(), // sender address
+            "0x000000000000000000000000db6fd484cfa46eeeb73c71edee823e4812f9e2e1".into()]); // recipient address
         assert_eq!(get_external::<ExternalInstance>().logs()[0].data.as_ref(), &[
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 232]);
         assert_eq!(contract.balanceOf(owner_address), 9000.into());
@@ -307,6 +307,11 @@ mod tests {
             let spender: Address = "0xdb6fd484cfa46eeeb73c71edee823e4812f9e2e1".into();
             contract.constructor(40000.into());
             contract.approve(spender, 40000.into());
+            assert_eq!(get_external::<ExternalInstance>().logs().len(), 1, "Should be 1 event logged");
+            assert_eq!(get_external::<ExternalInstance>().logs()[0].topics.as_ref(), &[
+                "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925".into(), // hash of the event name
+                "0x0000000000000000000000000000000000000000000000000000000000000000".into(), // sender (owner) address
+                "0x000000000000000000000000db6fd484cfa46eeeb73c71edee823e4812f9e2e1".into()]); // spender address
             assert_eq!(contract.allowance(::pwasm_std::ext::sender(), spender.clone()), 40000.into());
         }
     );
