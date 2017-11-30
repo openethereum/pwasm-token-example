@@ -144,6 +144,7 @@ pub mod contract {
             } else {
                 let new_sender_balance = senderBalance - amount;
                 let new_recipient_balance = recipientBalance + amount;
+                // TODO: impl From<U256> for H256 makes convertion to big endian. Could be optimized
                 storage::write(&balance_key(&sender), &new_sender_balance.into());
                 storage::write(&balance_key(&to), &new_recipient_balance.into());
                 self.Transfer(sender, to, amount);
