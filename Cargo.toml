@@ -9,7 +9,6 @@ pwasm-abi = { git = "https://github.com/paritytech/pwasm-abi" }
 pwasm-abi-derive = { git = "https://github.com/paritytech/pwasm-abi", path = "derive" }
 tiny-keccak = "1.3"
 
-
 [dev-dependencies]
 pwasm-test = { git = "https://github.com/paritytech/pwasm-test" }
 
