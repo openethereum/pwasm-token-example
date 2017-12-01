@@ -50,13 +50,15 @@ pub mod contract {
         fn constructor(&mut self, _total_supply: U256);
 
         /// What is the balance of a particular account?
+        #[constant]
         fn balanceOf(&mut self, _owner: Address) -> U256;
+
+        /// Total amount of tokens
+        #[constant]
+        fn totalSupply(&mut self) -> U256;
 
         /// Transfer the balance from owner's account to another account
         fn transfer(&mut self, _to: Address, _amount: U256) -> bool;
-
-        /// Total amount of tokens
-        fn totalSupply(&mut self) -> U256;
 
         /// Send _value amount of tokens from address _from to address _to
         /// The transferFrom method is used for a withdraw workflow, allowing contracts to send
@@ -135,6 +137,10 @@ pub mod contract {
             read_balance_of(&owner)
         }
 
+        fn totalSupply(&mut self) -> U256 {
+            storage::read(&TOTAL_SUPPLY_KEY).into()
+        }
+
         fn transfer(&mut self, to: Address, amount: U256) -> bool {
             let sender = ext::sender();
             let senderBalance = read_balance_of(&sender);
@@ -179,10 +185,6 @@ pub mod contract {
                 self.Transfer(from, to, amount);
                 true
             }
-        }
-
-        fn totalSupply(&mut self) -> U256 {
-            storage::read(&TOTAL_SUPPLY_KEY).into()
         }
     }
 }
