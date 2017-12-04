@@ -1,0 +1,101 @@
+[
+  {
+    "type": "function",
+    "name": "lend",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "returnValue",
+        "type": "bool"
+      }
+    ],
+    "constant": false
+  },
+  {
+    "type": "function",
+    "name": "pledge",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "returnValue",
+        "type": "bool"
+      }
+    ],
+    "constant": false
+  },
+  {
+    "type": "function",
+    "name": "redeem",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "returnValue",
+        "type": "bool"
+      }
+    ],
+    "constant": false
+  },
+  {
+    "type": "function",
+    "name": "claim",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "returnValue",
+        "type": "bool"
+      }
+    ],
+    "constant": false
+  },
+  {
+    "type": "event",
+    "name": "LendAccepted",
+    "inputs": []
+  },
+  {
+    "type": "event",
+    "name": "BorrowAccepted",
+    "inputs": []
+  },
+  {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "borrower",
+        "type": "address"
+      },
+      {
+        "name": "lender",
+        "type": "address"
+      },
+      {
+        "name": "borrowed_token",
+        "type": "address"
+      },
+      {
+        "name": "security_token",
+        "type": "address"
+      },
+      {
+        "name": "amount_to_borrow",
+        "type": "uint256"
+      },
+      {
+        "name": "security_amount",
+        "type": "uint256"
+      },
+      {
+        "name": "interest_rate",
+        "type": "uint256"
+      },
+      {
+        "name": "activation_deadline",
+        "type": "uint64"
+      },
+      {
+        "name": "return_deadline",
+        "type": "uint64"
+      }
+    ]
+  }
+]

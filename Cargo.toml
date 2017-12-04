@@ -16,6 +16,10 @@ pwasm-test = { git = "https://github.com/paritytech/pwasm-test" }
 name = "token"
 path = "src/token.rs"
 
+[[bin]]
+name = "repo"
+path = "src/repo.rs"
+
 [profile.release]
 panic = "abort"
 lto = true
