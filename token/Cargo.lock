@@ -117,6 +117,7 @@ dependencies = [
  "pwasm-abi 0.1.0 (git+https://github.com/paritytech/pwasm-abi)",
  "pwasm-abi-derive 0.1.0 (git+https://github.com/paritytech/pwasm-abi)",
  "pwasm-std 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pwasm-test 0.1.0 (git+https://github.com/paritytech/pwasm-test)",
  "tiny-keccak 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -213,18 +214,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 name = "unicode-xid"
 version = "0.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-
-[[package]]
-name = "wasm-token-example"
-version = "0.1.0"
-dependencies = [
- "pwasm-abi 0.1.0 (git+https://github.com/paritytech/pwasm-abi)",
- "pwasm-abi-derive 0.1.0 (git+https://github.com/paritytech/pwasm-abi)",
- "pwasm-std 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "pwasm-test 0.1.0 (git+https://github.com/paritytech/pwasm-test)",
- "pwasm-token-contract 0.1.0",
- "tiny-keccak 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
-]
 
 [metadata]
 "checksum bigint 4.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "5442186ef6560f30f1ee4b9c1e4c87a35a6879d3644550cc248ec2b955eb5fcd"

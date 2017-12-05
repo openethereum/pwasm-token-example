@@ -48,6 +48,30 @@
     "constant": false
   },
   {
+    "type": "function",
+    "name": "lending_accepted",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "returnValue",
+        "type": "bool"
+      }
+    ],
+    "constant": false
+  },
+  {
+    "type": "function",
+    "name": "pledge_accepted",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "returnValue",
+        "type": "bool"
+      }
+    ],
+    "constant": false
+  },
+  {
     "type": "event",
     "name": "LendAccepted",
     "inputs": []
