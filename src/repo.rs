@@ -115,63 +115,8 @@ pub mod contract {
     static RETURN_DEADLINE_KEY: H256 = H256([10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
     static BORROW_ACCEPTED_KEY: H256 = H256([11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
     static LEND_ACCEPTED_KEY: H256 = H256([12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+
     static DIVISOR: U256 = U256([100,0,0,0]);
-
-    pub fn read_borrower_address() -> Address {
-        H256::from(storage::read(&BORROWER_KEY)).into()
-    }
-
-    pub fn read_lender_address() -> Address {
-        H256::from(storage::read(&LENDER_KEY)).into()
-    }
-
-    pub fn read_borrowed_token_address() -> Address {
-        H256::from(storage::read(&BORROWED_TOKEN_KEY)).into()
-    }
-
-    pub fn read_security_token_address() -> Address {
-        H256::from(storage::read(&SECURITY_TOKEN_KEY)).into()
-    }
-
-    pub fn read_amount_to_borrow() -> U256 {
-        storage::read(&AMOUNT_TO_BORROW_KEY).into()
-    }
-
-    pub fn read_security_amount() -> U256 {
-        storage::read(&AMOUNT_FOR_SECURITY_KEY).into()
-    }
-
-    pub fn read_interest_rate() -> U256 {
-        storage::read(&INTEREST_RATE_KEY).into()
-    }
-
-    // Activation deadline timestamp
-    pub fn read_activation_deadline() -> u64 {
-        U256::from(storage::read(&ACTIVATION_DEADLINE_KEY)).into()
-    }
-
-    // Return deadline timestamp
-    pub fn read_return_deadline() -> u64 {
-        U256::from(storage::read(&RETURN_DEADLINE_KEY)).into()
-    }
-
-    pub fn read_borrower_acceptance() -> bool {
-        let value = U256::from(storage::read(&BORROW_ACCEPTED_KEY));
-        if value == 0.into() {
-            false
-        } else {
-            true
-        }
-    }
-
-    pub fn read_lender_acceptance() -> bool {
-        let value = U256::from(storage::read(&LEND_ACCEPTED_KEY));
-        if value == 0.into() {
-            false
-        } else {
-            true
-        }
-    }
 
     pub struct RepoContractInstance {
         storage: Storage
@@ -181,6 +126,61 @@ pub mod contract {
         pub fn new() -> RepoContractInstance {
             RepoContractInstance {
                 storage: Storage::with_capacity(10)
+            }
+        }
+        pub fn read_borrower_address(&mut self) -> Address {
+            H256::from(self.storage.read(&BORROWER_KEY)).into()
+        }
+
+        pub fn read_lender_address(&mut self) -> Address {
+            H256::from(self.storage.read(&LENDER_KEY)).into()
+        }
+
+        pub fn read_borrowed_token_address(&mut self) -> Address {
+            H256::from(self.storage.read(&BORROWED_TOKEN_KEY)).into()
+        }
+
+        pub fn read_security_token_address(&mut self) -> Address {
+            H256::from(self.storage.read(&SECURITY_TOKEN_KEY)).into()
+        }
+
+        pub fn read_amount_to_borrow(&mut self) -> U256 {
+            self.storage.read(&AMOUNT_TO_BORROW_KEY).into()
+        }
+
+        pub fn read_security_amount(&mut self) -> U256 {
+            self.storage.read(&AMOUNT_FOR_SECURITY_KEY).into()
+        }
+
+        pub fn read_interest_rate(&mut self) -> U256 {
+            self.storage.read(&INTEREST_RATE_KEY).into()
+        }
+
+        // Activation deadline timestamp
+        pub fn read_activation_deadline(&mut self) -> u64 {
+            U256::from(self.storage.read(&ACTIVATION_DEADLINE_KEY)).into()
+        }
+
+        // Return deadline timestamp
+        pub fn read_return_deadline(&mut self) -> u64 {
+            U256::from(self.storage.read(&RETURN_DEADLINE_KEY)).into()
+        }
+
+        pub fn read_borrower_acceptance(&mut self) -> bool {
+            let value = U256::from(self.storage.read(&BORROW_ACCEPTED_KEY));
+            if value == 0.into() {
+                false
+            } else {
+                true
+            }
+        }
+
+        pub fn read_lender_acceptance(&mut self) -> bool {
+            let value = U256::from(self.storage.read(&LEND_ACCEPTED_KEY));
+            if value == 0.into() {
+                false
+            } else {
+                true
             }
         }
     }
@@ -213,11 +213,11 @@ pub mod contract {
             // if ext::timestamp() > read_activation_deadline()
             // 1. Do not allow to join if activation deadline has reached
             // 2. Only borrower can pledge
-            if ext::timestamp() > read_activation_deadline() {
+            if ext::timestamp() > self.read_activation_deadline() {
                 ext::suicide(&ext::sender());
                 return false;
             }
-            if ext::sender() != read_borrower_address() {
+            if ext::sender() != self.read_borrower_address() {
                 return false;
             }
             storage::write(&BORROW_ACCEPTED_KEY, &U256::from(1).into());
@@ -226,11 +226,11 @@ pub mod contract {
         }
 
         fn lend(&mut self) -> bool {
-            if read_lender_acceptance() {
+            if self.read_lender_acceptance() {
                 return true;
             }
             // 1. Do not allow to join if activation deadline has reached
-            if ext::timestamp() > read_activation_deadline() {
+            if ext::timestamp() > self.read_activation_deadline() {
                 ext::suicide(&ext::sender());
                 return false;
             }
@@ -299,15 +299,15 @@ mod tests {
 
             contract.constructor(borrower.clone(), lender.clone(), borrowed_token.clone(), security_token.clone(),
                 amount_to_borrow, security_amount, interest_rate, activation_deadline, return_deadline);
-            assert_eq!(read_borrower_address(), borrower);
-            assert_eq!(read_lender_address(), lender);
-            assert_eq!(read_borrowed_token_address(), borrowed_token);
-            assert_eq!(read_security_token_address(), security_token);
-            assert_eq!(read_amount_to_borrow(), amount_to_borrow);
-            assert_eq!(read_security_amount(), security_amount);
-            assert_eq!(read_interest_rate(), interest_rate);
-            assert_eq!(read_activation_deadline(), activation_deadline);
-            assert_eq!(read_return_deadline(), return_deadline);
+            assert_eq!(contract.read_borrower_address(), borrower);
+            assert_eq!(contract.read_lender_address(), lender);
+            assert_eq!(contract.read_borrowed_token_address(), borrowed_token);
+            assert_eq!(contract.read_security_token_address(), security_token);
+            assert_eq!(contract.read_amount_to_borrow(), amount_to_borrow);
+            assert_eq!(contract.read_security_amount(), security_amount);
+            assert_eq!(contract.read_interest_rate(), interest_rate);
+            assert_eq!(contract.read_activation_deadline(), activation_deadline);
+            assert_eq!(contract.read_return_deadline(), return_deadline);
         }
     );
 
