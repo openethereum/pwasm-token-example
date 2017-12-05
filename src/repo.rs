@@ -58,9 +58,18 @@ pub mod contract {
             value
         }
 
-        // TODO: update cache
         fn write(&mut self, key: &H256, value: &[u8; 32]) {
             storage::write(key, value);
+            for entry in &mut self.table {
+                if *key == entry.key {
+                    entry.value = *value;
+                    return;
+                }
+            }
+            self.table.push(Entry {
+                key: key.clone(),
+                value: value.clone()
+            });
         }
     }
 
@@ -198,15 +207,15 @@ pub mod contract {
             activation_deadline: u64,
             return_deadline: u64) {
 
-            storage::write(&BORROWER_KEY, &H256::from(borrower).into());
-            storage::write(&LENDER_KEY, &H256::from(lender).into());
-            storage::write(&BORROWED_TOKEN_KEY, &H256::from(borrowed_token).into());
-            storage::write(&SECURITY_TOKEN_KEY, &H256::from(security_token).into());
-            storage::write(&AMOUNT_TO_BORROW_KEY, &amount_to_borrow.into());
-            storage::write(&AMOUNT_FOR_SECURITY_KEY, &security_amount.into());
-            storage::write(&INTEREST_RATE_KEY, &interest_rate.into());
-            storage::write(&ACTIVATION_DEADLINE_KEY, &U256::from(activation_deadline).into());
-            storage::write(&RETURN_DEADLINE_KEY, &U256::from(return_deadline).into());
+            self.storage.write(&BORROWER_KEY, &H256::from(borrower).into());
+            self.storage.write(&LENDER_KEY, &H256::from(lender).into());
+            self.storage.write(&BORROWED_TOKEN_KEY, &H256::from(borrowed_token).into());
+            self.storage.write(&SECURITY_TOKEN_KEY, &H256::from(security_token).into());
+            self.storage.write(&AMOUNT_TO_BORROW_KEY, &amount_to_borrow.into());
+            self.storage.write(&AMOUNT_FOR_SECURITY_KEY, &security_amount.into());
+            self.storage.write(&INTEREST_RATE_KEY, &interest_rate.into());
+            self.storage.write(&ACTIVATION_DEADLINE_KEY, &U256::from(activation_deadline).into());
+            self.storage.write(&RETURN_DEADLINE_KEY, &U256::from(return_deadline).into());
         }
 
         fn pledge(&mut self) -> bool {
@@ -220,7 +229,7 @@ pub mod contract {
             if ext::sender() != self.read_borrower_address() {
                 return false;
             }
-            storage::write(&BORROW_ACCEPTED_KEY, &U256::from(1).into());
+            self.storage.write(&BORROW_ACCEPTED_KEY, &U256::from(1).into());
 
             return true;
         }
