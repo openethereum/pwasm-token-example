@@ -14,7 +14,7 @@ extern crate pwasm_abi;
 extern crate pwasm_abi_derive;
 
 use pwasm_abi::eth::EndpointInterface;
-use pwasm_std::{storage};
+use pwasm_std::{storage, Vec};
 use pwasm_std::hash::{H256};
 
 struct Entry {
@@ -218,7 +218,7 @@ pub mod contract {
         fn accept(&mut self) -> bool {
             let sender = ext::sender();
             if self.is_active() {
-                panic!("Cannot accept, contract is activated already");
+                panic!("Cannot accept, contract has activated already");
             }
             if ext::timestamp() > self.read_activation_deadline() {
                 ext::suicide(&sender);
