@@ -14,8 +14,8 @@ extern crate pwasm_abi;
 extern crate pwasm_abi_derive;
 
 use pwasm_abi::eth::EndpointInterface;
-use pwasm_std::{storage, ext};
-use pwasm_std::hash::{Address, H256};
+use pwasm_std::{storage};
+use pwasm_std::hash::{H256};
 
 struct Entry {
     key: H256,
@@ -72,7 +72,7 @@ pub mod contract {
     extern crate pwasm_token_contract;
     use alloc::vec::Vec;
 
-    use pwasm_std::{storage, ext};
+    use pwasm_std::{ext};
     use pwasm_std::hash::{Address, H256};
     use pwasm_std::bigint::U256;
 
@@ -184,6 +184,10 @@ pub mod contract {
                 true
             }
         }
+
+        pub fn is_active(&mut self) -> bool {
+            self.read_borrower_acceptance() && self.read_lender_acceptance()
+        }
     }
 
     impl RepoContract for RepoContractInstance {
@@ -213,6 +217,9 @@ pub mod contract {
         // Tries to activate contract
         fn accept(&mut self) -> bool {
             let sender = ext::sender();
+            if self.is_active() {
+                panic!("Cannot accept, contract is activated already");
+            }
             if ext::timestamp() > self.read_activation_deadline() {
                 ext::suicide(&sender);
             }
@@ -251,6 +258,9 @@ pub mod contract {
         }
 
         fn terminate(&mut self) -> bool {
+            if !self.is_active() {
+                panic!("Can't terminate contract: contract hasn't activated");
+            }
             let lender_address = self.read_lender_address();
             let borrower_address = self.read_borrower_address();
             let mut loan_token = Token::new(self.read_loan_token_address());
@@ -260,6 +270,7 @@ pub mod contract {
             let security_amount = self.read_security_amount();
             let interest_amount = (loan_amount / DIVISOR) * self.read_interest_rate();
             let return_amount = loan_amount + interest_amount;
+
 
             if ext::timestamp() <= self.read_return_deadline() {
                 if sender != borrower_address {
@@ -299,11 +310,14 @@ extern crate pwasm_test;
 #[allow(non_snake_case)]
 mod tests {
     extern crate std;
+    extern crate pwasm_token_contract;
+
     use pwasm_test;
     use super::contract::*;
-    use self::pwasm_test::{External, ExternalBuilder, ExternalInstance, get_external, set_external};
+    use self::pwasm_test::{Error, External, ExternalBuilder, ExternalInstance, get_external, set_external};
     use pwasm_std::bigint::U256;
     use pwasm_std::hash::{Address};
+    use pwasm_abi::eth::EndpointInterface;
 
     test_with_external!(
         ExternalBuilder::new().build(),
@@ -333,10 +347,45 @@ mod tests {
         }
     );
 
+    use self::pwasm_token_contract::{TokenContract, Endpoint};
+
+    struct TokenMock;
+
+    impl TokenContract for TokenMock {
+        fn constructor(&mut self, _total_supply: U256) {
+        }
+        fn balanceOf(&mut self, _owner: Address) -> U256 {
+            0.into()
+        }
+        fn totalSupply(&mut self) -> U256 {
+            0.into()
+        }
+        fn transfer(&mut self, _to: Address, _amount: U256) -> bool {
+            true
+        }
+        fn approve(&mut self, _spender: Address, _value: U256) -> bool {
+            true
+        }
+        fn allowance(&mut self, _owner: Address, _spender: Address) -> U256 {
+            0.into()
+        }
+        fn transferFrom(&mut self, _from: Address, _to: Address, _amount: U256) -> bool {
+            true
+        }
+    }
+
+    fn fake_token_endpoint(_val: U256, input: &[u8], result: &mut [u8]) -> Result<(), Error> {
+        let mut endpoint = Endpoint::new(TokenMock{});
+        result.copy_from_slice(&endpoint.dispatch(input));
+        Ok(())
+    }
+
     test_with_external!(
         ExternalBuilder::new()
             .sender("0xea674fdde714fd979de3edf0f56aa9716b898ec8".into())
             .timestamp(5)
+            .endpoint("0x0f572e5295c57f15886f9b263e2f6d2d6c7b5ec6".into(), Box::new(fake_token_endpoint))
+            .endpoint("0xcd1722f2947def4cf144679da39c4c32bdc35681".into(), Box::new(fake_token_endpoint))
             .build(),
         should_pledge {
             let mut contract = RepoContractInstance::new();
@@ -361,7 +410,7 @@ mod tests {
                 .build();
             set_external(Box::new(spenderExternal));
             assert_eq!(contract.accept(), true);
-            // assert_eq!(contract.read_borrower_acceptance(), true)
+            assert_eq!(contract.read_borrower_acceptance(), true)
         }
     );
 

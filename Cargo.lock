@@ -105,7 +105,7 @@ dependencies = [
 [[package]]
 name = "pwasm-test"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/pwasm-test#d34e681e908ade836fc96e7eea3ab23151651b77"
+source = "git+https://github.com/paritytech/pwasm-test#47ca5bde1cab8b3cfff503b9fc949e1794c2ed4b"
 dependencies = [
  "pwasm-std 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
