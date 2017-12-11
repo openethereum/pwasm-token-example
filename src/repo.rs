@@ -17,6 +17,21 @@ use pwasm_abi::eth::EndpointInterface;
 use pwasm_std::{storage, Vec};
 use pwasm_std::hash::{H256};
 
+// Generates storage keys. Each key = previous_key + 1. 256 keys max
+macro_rules! storage_keys {
+    () => {};
+    ($($name:ident),*) => {
+        storage_keys!(0u8, $($name),*);
+    };
+    ($count:expr, $name:ident) => {
+        static $name: H256 = H256([$count, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+    };
+    ($count:expr, $name:ident, $($tail:ident),*) => {
+        static $name: H256 = H256([$count, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+        storage_keys!($count + 1u8, $($tail),*);
+    };
+}
+
 struct Entry {
     key: H256,
     value: [u8; 32]
@@ -105,17 +120,14 @@ pub mod contract {
 
     }
 
-    static BORROWER_KEY: H256 = H256([2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-    static LENDER_KEY: H256 = H256([3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-    static LOAN_TOKEN_KEY: H256 = H256([4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-    static SECURITY_TOKEN_KEY: H256 = H256([5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-    static LOAN_AMOUNT_KEY: H256 = H256([6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-    static SECURITY_AMOUNT_KEY: H256 = H256([7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-    static INTEREST_RATE_KEY: H256 = H256([8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-    static ACTIVATION_DEADLINE_KEY: H256 = H256([9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-    static RETURN_DEADLINE_KEY: H256 = H256([10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-    static BORROW_ACCEPTED_KEY: H256 = H256([11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-    static LEND_ACCEPTED_KEY: H256 = H256([12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+    storage_keys!(
+        BORROWER_KEY, LENDER_KEY,
+        LOAN_TOKEN_KEY, SECURITY_TOKEN_KEY,
+        LOAN_AMOUNT_KEY, SECURITY_AMOUNT_KEY,
+        INTEREST_RATE_KEY,
+        ACTIVATION_DEADLINE_KEY, RETURN_DEADLINE_KEY,
+        BORROW_ACCEPTED_KEY, LEND_ACCEPTED_KEY
+    );
 
     static DIVISOR: U256 = U256([100,0,0,0]);
 
