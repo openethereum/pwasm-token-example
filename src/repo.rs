@@ -201,8 +201,8 @@ pub mod contract {
             security_amount: U256,
             interest_rate: U256,
             activation_deadline: u64,
-            return_deadline: u64) {
-
+            return_deadline: u64
+        ) {
             self.storage.write(&BORROWER_KEY, &H256::from(borrower).into());
             self.storage.write(&LENDER_KEY, &H256::from(lender).into());
             self.storage.write(&LOAN_TOKEN_KEY, &H256::from(loan_token).into());
