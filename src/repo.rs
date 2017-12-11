@@ -258,8 +258,9 @@ pub mod contract {
         }
 
         fn terminate(&mut self) -> bool {
-            if !self.is_active() {
-                panic!("Can't terminate contract: contract hasn't activated");
+            if !self.is_active() && ext::timestamp() > self.activation_deadline() {
+                // ext::suicide(&sender); // TODO: figure out how to mock ext::suicide
+                return false;
             }
             let lender_address = self.lender_address();
             let borrower_address = self.borrower_address();
