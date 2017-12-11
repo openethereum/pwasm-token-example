@@ -129,45 +129,45 @@ pub mod contract {
                 storage: super::Storage::with_capacity(10)
             }
         }
-        pub fn read_borrower_address(&mut self) -> Address {
+        pub fn borrower_address(&mut self) -> Address {
             H256::from(self.storage.read(&BORROWER_KEY)).into()
         }
 
-        pub fn read_lender_address(&mut self) -> Address {
+        pub fn lender_address(&mut self) -> Address {
             H256::from(self.storage.read(&LENDER_KEY)).into()
         }
 
-        pub fn read_loan_token_address(&mut self) -> Address {
+        pub fn loan_token_address(&mut self) -> Address {
             H256::from(self.storage.read(&LOAN_TOKEN_KEY)).into()
         }
 
-        pub fn read_security_token_address(&mut self) -> Address {
+        pub fn security_token_address(&mut self) -> Address {
             H256::from(self.storage.read(&SECURITY_TOKEN_KEY)).into()
         }
 
-        pub fn read_loan_amount(&mut self) -> U256 {
+        pub fn loan_amount(&mut self) -> U256 {
             self.storage.read(&LOAN_AMOUNT_KEY).into()
         }
 
-        pub fn read_security_amount(&mut self) -> U256 {
+        pub fn security_amount(&mut self) -> U256 {
             self.storage.read(&SECURITY_AMOUNT_KEY).into()
         }
 
-        pub fn read_interest_rate(&mut self) -> U256 {
+        pub fn interest_rate(&mut self) -> U256 {
             self.storage.read(&INTEREST_RATE_KEY).into()
         }
 
         // Activation deadline timestamp
-        pub fn read_activation_deadline(&mut self) -> u64 {
+        pub fn activation_deadline(&mut self) -> u64 {
             U256::from(self.storage.read(&ACTIVATION_DEADLINE_KEY)).into()
         }
 
         // Return deadline timestamp
-        pub fn read_return_deadline(&mut self) -> u64 {
+        pub fn return_deadline(&mut self) -> u64 {
             U256::from(self.storage.read(&RETURN_DEADLINE_KEY)).into()
         }
 
-        pub fn read_borrower_acceptance(&mut self) -> bool {
+        pub fn borrower_acceptance(&mut self) -> bool {
             let value = U256::from(self.storage.read(&BORROW_ACCEPTED_KEY));
             if value == 0.into() {
                 false
@@ -176,7 +176,7 @@ pub mod contract {
             }
         }
 
-        pub fn read_lender_acceptance(&mut self) -> bool {
+        pub fn lender_acceptance(&mut self) -> bool {
             let value = U256::from(self.storage.read(&LEND_ACCEPTED_KEY));
             if value == 0.into() {
                 false
@@ -186,7 +186,7 @@ pub mod contract {
         }
 
         pub fn is_active(&mut self) -> bool {
-            self.read_borrower_acceptance() && self.read_lender_acceptance()
+            self.borrower_acceptance() && self.lender_acceptance()
         }
     }
 
@@ -220,12 +220,12 @@ pub mod contract {
             if self.is_active() {
                 panic!("Cannot accept, contract has activated already");
             }
-            if ext::timestamp() > self.read_activation_deadline() {
+            if ext::timestamp() > self.activation_deadline() {
                 ext::suicide(&sender);
             }
 
-            let lender_address = self.read_lender_address();
-            let borrower_address = self.read_borrower_address();
+            let lender_address = self.lender_address();
+            let borrower_address = self.borrower_address();
 
             // Accept by borrower
             if sender == borrower_address {
@@ -239,14 +239,14 @@ pub mod contract {
             }
 
             // Wait for all parties to accept
-            if !(self.read_borrower_acceptance() && self.read_lender_acceptance()) {
+            if !(self.borrower_acceptance() && self.lender_acceptance()) {
                 return false;
             }
 
-            let mut loan_token = Token::new(self.read_loan_token_address());
-            let mut security_token = Token::new(self.read_security_token_address());
-            let loan_amount = self.read_loan_amount();
-            let security_amount = self.read_security_amount();
+            let mut loan_token = Token::new(self.loan_token_address());
+            let mut security_token = Token::new(self.security_token_address());
+            let loan_amount = self.loan_amount();
+            let security_amount = self.security_amount();
 
             let this_contract_address = ext::address();
             // Transfer security from borrower_address to the contract address
@@ -261,17 +261,17 @@ pub mod contract {
             if !self.is_active() {
                 panic!("Can't terminate contract: contract hasn't activated");
             }
-            let lender_address = self.read_lender_address();
-            let borrower_address = self.read_borrower_address();
-            let mut loan_token = Token::new(self.read_loan_token_address());
-            let mut security_token = Token::new(self.read_security_token_address());
+            let lender_address = self.lender_address();
+            let borrower_address = self.borrower_address();
+            let mut loan_token = Token::new(self.loan_token_address());
+            let mut security_token = Token::new(self.security_token_address());
             let sender = ext::sender();
-            let loan_amount = self.read_loan_amount();
-            let security_amount = self.read_security_amount();
-            let interest_amount = (loan_amount / DIVISOR) * self.read_interest_rate();
+            let loan_amount = self.loan_amount();
+            let security_amount = self.security_amount();
+            let interest_amount = (loan_amount / DIVISOR) * self.interest_rate();
             let return_amount = loan_amount + interest_amount;
 
-            if ext::timestamp() <= self.read_return_deadline() {
+            if ext::timestamp() <= self.return_deadline() {
                 if sender != borrower_address {
                     panic!("Only borrower can terminate contract if deadline hasn't came");
                 }
@@ -444,15 +444,15 @@ mod tests {
 
             contract.constructor(BORROWER_ADDR.clone(), LENDER_ADDR.clone(), LOAN_TOKEN_ADDR.clone(), SECURITY_TOKEN_ADDR.clone(),
                 loan_amount, security_amount, interest_rate, activation_deadline, return_deadline);
-            assert_eq!(contract.read_borrower_address(), BORROWER_ADDR);
-            assert_eq!(contract.read_lender_address(), LENDER_ADDR);
-            assert_eq!(contract.read_loan_token_address(), LOAN_TOKEN_ADDR);
-            assert_eq!(contract.read_security_token_address(), SECURITY_TOKEN_ADDR);
-            assert_eq!(contract.read_loan_amount(), loan_amount);
-            assert_eq!(contract.read_security_amount(), security_amount);
-            assert_eq!(contract.read_interest_rate(), interest_rate);
-            assert_eq!(contract.read_activation_deadline(), activation_deadline);
-            assert_eq!(contract.read_return_deadline(), return_deadline);
+            assert_eq!(contract.borrower_address(), BORROWER_ADDR);
+            assert_eq!(contract.lender_address(), LENDER_ADDR);
+            assert_eq!(contract.loan_token_address(), LOAN_TOKEN_ADDR);
+            assert_eq!(contract.security_token_address(), SECURITY_TOKEN_ADDR);
+            assert_eq!(contract.loan_amount(), loan_amount);
+            assert_eq!(contract.security_amount(), security_amount);
+            assert_eq!(contract.interest_rate(), interest_rate);
+            assert_eq!(contract.activation_deadline(), activation_deadline);
+            assert_eq!(contract.return_deadline(), return_deadline);
         }
     );
 
@@ -466,7 +466,7 @@ mod tests {
             .build()));
         let mut contract = default_contract();
         assert_eq!(contract.accept(), false);
-        assert_eq!(contract.read_borrower_acceptance(), true);
+        assert_eq!(contract.borrower_acceptance(), true);
         // Set sender to lender
         let spenderExternal = ext_builder().sender(LENDER_ADDR).build();
         set_external(Box::new(spenderExternal));
@@ -487,7 +487,7 @@ mod tests {
         assert_eq!(Address::from(H256::from(&loan_transfer.input[36..68])), BORROWER_ADDR);
         assert_eq!(U256::from(H256::from(&loan_transfer.input[68..100])), 10000.into());
 
-        assert_eq!(contract.read_lender_acceptance(), true);
+        assert_eq!(contract.lender_acceptance(), true);
         assert_eq!(contract.is_active(), true);
     }
 
