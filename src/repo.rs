@@ -106,16 +106,20 @@ pub mod contract {
             interest_rate: U256,
             activation_deadline: u64,
             return_deadline: u64);
-
         fn accept(&mut self) -> bool;
-
         fn terminate(&mut self) -> bool;
-
         #[event]
-        fn LendAccepted(&mut self);
+        fn LenderAcceptance(&mut self);
         #[event]
-        fn BorrowAccepted(&mut self);
-
+        fn BorrowerAcceptance(&mut self);
+        #[event]
+        fn Activation(&mut self);
+        #[event]
+        fn Refund(&mut self);
+        #[event]
+        fn Default(&mut self);
+        #[event]
+        fn Suicide(&mut self);
     }
 
     storage_keys!(
@@ -231,6 +235,7 @@ pub mod contract {
                 panic!("Cannot accept, contract has activated already");
             }
             if ext::timestamp() > self.activation_deadline() {
+                self.Suicide();
                 ext::suicide(&sender);
             }
             let lender_address = self.lender_address();
@@ -239,10 +244,12 @@ pub mod contract {
             // Accept by borrower
             if sender == borrower_address {
                 self.storage.write(&BORROW_ACCEPTED_KEY, &U256::from(1).into());
+                self.BorrowerAcceptance();
             }
             // Accept by lender
             else if sender == lender_address {
                 self.storage.write(&LEND_ACCEPTED_KEY, &U256::from(1).into());
+                self.LenderAcceptance();
             } else {
                 panic!("Only for participants");
             }
@@ -269,6 +276,7 @@ pub mod contract {
         fn terminate(&mut self) -> bool {
             let sender = ext::sender();
             if !self.is_active() && ext::timestamp() > self.activation_deadline() {
+                self.Suicide();
                 ext::suicide(&sender);
             }
             let lender_address = self.lender_address();
@@ -286,12 +294,14 @@ pub mod contract {
                 }
                 assert!(loan_token.transferFrom(borrower_address, lender_address, return_amount));
                 assert!(security_token.transfer(borrower_address, security_amount));
+                self.Refund();
                 if cfg!(test) {
                     return false
                 }
                 ext::suicide(&sender);
             } else {
                 assert!(security_token.transfer(lender_address, security_amount));
+                self.Default();
                 if cfg!(test) {
                     return false
                 }
