@@ -15,7 +15,7 @@ extern crate pwasm_abi_derive;
 
 use pwasm_abi::eth::EndpointInterface;
 use pwasm_std::{storage, Vec};
-use pwasm_std::hash::{H256};
+use pwasm_std::hash::H256;
 
 // Generates storage keys. Each key = previous_key + 1. 256 keys max
 macro_rules! storage_keys {
@@ -86,10 +86,9 @@ pub mod contract {
     extern crate pwasm_token_contract;
     use alloc::vec::Vec;
 
-    use pwasm_std::{ext};
+    use pwasm_std::ext;
     use pwasm_std::hash::{Address, H256};
     use pwasm_std::bigint::U256;
-
     use pwasm_abi_derive::eth_abi;
 
     use contract::pwasm_token_contract::TokenContract;
@@ -268,15 +267,14 @@ pub mod contract {
         }
 
         fn terminate(&mut self) -> bool {
+            let sender = ext::sender();
             if !self.is_active() && ext::timestamp() > self.activation_deadline() {
-                // ext::suicide(&sender); // TODO: figure out how to mock ext::suicide
-                return false;
+                ext::suicide(&sender);
             }
             let lender_address = self.lender_address();
             let borrower_address = self.borrower_address();
             let mut loan_token = Token::new(self.loan_token_address());
             let mut security_token = Token::new(self.security_token_address());
-            let sender = ext::sender();
             let loan_amount = self.loan_amount();
             let security_amount = self.security_amount();
             let interest_amount = (loan_amount / DIVISOR) * self.interest_rate();
@@ -288,12 +286,16 @@ pub mod contract {
                 }
                 assert!(loan_token.transferFrom(borrower_address, lender_address, return_amount));
                 assert!(security_token.transfer(borrower_address, security_amount));
-                // ext::suicide(&sender); // TODO: figure out how to mock ext::suicide
-                true
+                if cfg!(test) {
+                    return false
+                }
+                ext::suicide(&sender);
             } else {
                 assert!(security_token.transfer(lender_address, security_amount));
-                // ext::suicide(&sender); // TODO: figure out how to mock ext::suicide
-                true
+                if cfg!(test) {
+                    return false
+                }
+                ext::suicide(&sender);
             }
         }
     }
@@ -416,8 +418,15 @@ mod tests {
         let interest_rate: U256 = 3.into();
         let activation_deadline: u64 = 10;
         let return_deadline: u64 = 20;
-        contract.constructor(BORROWER_ADDR.clone(), LENDER_ADDR.clone(), LOAN_TOKEN_ADDR.clone(), SECURITY_TOKEN_ADDR.clone(),
-                loan_amount, security_amount, interest_rate, activation_deadline, return_deadline);
+        contract.constructor(BORROWER_ADDR.clone(),
+            LENDER_ADDR.clone(),
+            LOAN_TOKEN_ADDR.clone(),
+            SECURITY_TOKEN_ADDR.clone(),
+            loan_amount,
+            security_amount,
+            interest_rate,
+            activation_deadline,
+            return_deadline);
         contract
     }
 
@@ -448,8 +457,16 @@ mod tests {
             let activation_deadline: u64 = 10;
             let return_deadline: u64 = 20;
 
-            contract.constructor(BORROWER_ADDR.clone(), LENDER_ADDR.clone(), LOAN_TOKEN_ADDR.clone(), SECURITY_TOKEN_ADDR.clone(),
-                loan_amount, security_amount, interest_rate, activation_deadline, return_deadline);
+            contract.constructor(BORROWER_ADDR.clone(),
+                LENDER_ADDR.clone(),
+                LOAN_TOKEN_ADDR.clone(),
+                SECURITY_TOKEN_ADDR.clone(),
+                loan_amount,
+                security_amount,
+                interest_rate,
+                activation_deadline,
+                return_deadline);
+
             assert_eq!(contract.borrower_address(), BORROWER_ADDR);
             assert_eq!(contract.lender_address(), LENDER_ADDR);
             assert_eq!(contract.loan_token_address(), LOAN_TOKEN_ADDR);
