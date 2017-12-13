@@ -1,16 +1,10 @@
-#![feature(proc_macro)]
-#![feature(alloc)]
-
 // Contract doesn't need standard library and the `main` function.
 // `cargo test` requires `std` and it provided the `main` which is why the "std" feature should be turned on for `cargo test`
 #![cfg_attr(not(feature="std"), no_main)]
 #![cfg_attr(not(feature="std"), no_std)]
 
-extern crate tiny_keccak;
-extern crate alloc;
 extern crate pwasm_std;
 extern crate pwasm_abi;
-extern crate pwasm_abi_derive;
 extern crate pwasm_token_contract;
 
 use pwasm_abi::eth::EndpointInterface;

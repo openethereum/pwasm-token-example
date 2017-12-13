@@ -1,14 +1,14 @@
 [package]
-name = "wasm-token-example"
+name = "pwasm-token-contract-bin"
 version = "0.1.0"
 authors = ["Alexey Frolov <frol.rage@gmail.com>"]
 
 [dependencies]
 pwasm-std = "0.2"
 pwasm-abi = { git = "https://github.com/paritytech/pwasm-abi" }
-pwasm-abi-derive = { git = "https://github.com/paritytech/pwasm-abi", path = "derive" }
+pwasm-abi-derive = { git = "https://github.com/paritytech/pwasm-abi" }
 tiny-keccak = "1.3"
-pwasm-token-contract = { path = "token" }
+pwasm-token-contract = { path = "contract" }
 
 [dev-dependencies]
 pwasm-test = { git = "https://github.com/paritytech/pwasm-test" }
@@ -16,10 +16,6 @@ pwasm-test = { git = "https://github.com/paritytech/pwasm-test" }
 [[bin]]
 name = "token"
 path = "src/token.rs"
-
-[[bin]]
-name = "repo"
-path = "src/repo.rs"
 
 [profile.release]
 panic = "abort"
