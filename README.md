@@ -7,4 +7,4 @@
 ## Build
 `./build.sh`
 ## Testing
-`cargo test --features std`
+`cargo test --manifest-path="contract/Cargo.toml" --features std`
