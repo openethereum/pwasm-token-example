@@ -5,7 +5,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "byteorder 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "crunchy 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "rustc-hex 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc_version 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -125,11 +124,9 @@ name = "pwasm-token-contract-bin"
 version = "0.1.0"
 dependencies = [
  "pwasm-abi 0.1.0 (git+https://github.com/paritytech/pwasm-abi)",
- "pwasm-abi-derive 0.1.0 (git+https://github.com/paritytech/pwasm-abi)",
  "pwasm-std 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pwasm-test 0.1.0 (git+https://github.com/paritytech/pwasm-test)",
  "pwasm-token-contract 0.1.0",
- "tiny-keccak 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
