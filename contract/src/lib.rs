@@ -7,16 +7,19 @@
 
 extern crate tiny_keccak;
 extern crate alloc;
+extern crate bigint;
+extern crate parity_hash;
 extern crate pwasm_std;
+extern crate pwasm_ethereum;
 extern crate pwasm_abi;
 extern crate pwasm_abi_derive;
 
 use alloc::vec::Vec;
 
 use tiny_keccak::Keccak;
-use pwasm_std::{storage, ext};
+use pwasm_ethereum::{storage, ext};
 use pwasm_std::hash::{Address, H256};
-use pwasm_std::bigint::U256;
+use bigint::U256;
 use pwasm_abi_derive::eth_abi;
 
 // TokenContract is an interface definition of a contract.
@@ -192,7 +195,7 @@ mod tests {
     extern crate std;
     use super::*;
     use pwasm_test::{External, ExternalBuilder, ExternalInstance, get_external, set_external};
-    use pwasm_std::bigint::U256;
+    use bigint::U256;
     use pwasm_std::hash::{Address};
 
     test_with_external!(
@@ -275,7 +278,7 @@ mod tests {
         let mut contract = TokenContractInstance{};
         contract.constructor(10000.into());
         assert_eq!(contract.transfer("0xdb6fd484cfa46eeeb73c71edee823e4812f9e2e1".into(), 50000.into()), false);
-        assert_eq!(contract.balanceOf(::pwasm_std::ext::sender()), 10000.into());
+        assert_eq!(contract.balanceOf(::pwasm_ethereum::ext::sender()), 10000.into());
         assert_eq!(contract.balanceOf("0xdb6fd484cfa46eeeb73c71edee823e4812f9e2e1".into()), 0.into());
         assert_eq!(get_external::<ExternalInstance>().logs().len(), 0, "Should be no events created");
     }
@@ -292,7 +295,7 @@ mod tests {
                 "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925".into(), // hash of the event name
                 "0x0000000000000000000000000000000000000000000000000000000000000000".into(), // sender (owner) address
                 "0x000000000000000000000000db6fd484cfa46eeeb73c71edee823e4812f9e2e1".into()]); // spender address
-            assert_eq!(contract.allowance(::pwasm_std::ext::sender(), spender.clone()), 40000.into());
+            assert_eq!(contract.allowance(::pwasm_ethereum::ext::sender(), spender.clone()), 40000.into());
         }
     );
 
