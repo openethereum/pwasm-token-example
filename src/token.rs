@@ -1,6 +1,9 @@
 // Contract doesn't need standard library and the `main` function.
 #![no_main]
 #![no_std]
+#![feature(start)]
+#![feature(wasm_import_memory)]
+#![wasm_import_memory]
 
 extern crate pwasm_std;
 extern crate pwasm_abi;
@@ -25,4 +28,10 @@ pub fn deploy(desc: *mut u8) {
     let (args, _) = unsafe { pwasm_std::parse_args(desc) };
     let mut endpoint = pwasm_token_contract::Endpoint::new(pwasm_token_contract::TokenContractInstance{});
     endpoint.dispatch_ctor(&args);
+}
+
+#[no_mangle]
+#[start]
+pub extern fn main(_argc: i32, _argv: *const *const u8) -> i32 {
+    0
 }

@@ -16,5 +16,7 @@ name = "token"
 path = "src/token.rs"
 
 [profile.release]
+opt-level = "z"
+debug = 0
 panic = "abort"
 lto = true

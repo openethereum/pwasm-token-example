@@ -1,7 +1,7 @@
 #!/bin/bash
 
-cargo build --release --target wasm32-unknown-emscripten
-wasm-build ./target token
+cargo build --release --target wasm32-unknown-unknown
+wasm-build --target wasm32-unknown-unknown ./target token
 
 cp ./target/*.wasm ./compiled
 cp ./target/json/* ./compiled
