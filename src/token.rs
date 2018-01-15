@@ -1,5 +1,4 @@
 // Contract doesn't need standard library and the `main` function.
-// `cargo test` requires `std` and it provided the `main` which is why the "std" feature should be turned on for `cargo test`
 #![no_std]
 
 extern crate pwasm_std;
