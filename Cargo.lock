@@ -79,7 +79,7 @@ name = "pwasm-alloc"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "pwasm-libc 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pwasm-libc 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -90,24 +90,24 @@ dependencies = [
  "bigint 4.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "byteorder 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-hash 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "pwasm-std 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pwasm-std 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "pwasm-libc"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "pwasm-std"
-version = "0.3.0"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "byteorder 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "cfg-if 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-hash 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pwasm-alloc 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "pwasm-libc 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pwasm-libc 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "tiny-keccak 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -118,7 +118,7 @@ source = "git+https://github.com/paritytech/pwasm-test#cfa1d936bbc7d8ddf2538b0e6
 dependencies = [
  "bigint 4.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pwasm-ethereum 0.1.0 (git+https://github.com/nikvolf/pwasm-ethereum)",
- "pwasm-std 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pwasm-std 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -130,7 +130,7 @@ dependencies = [
  "pwasm-abi 0.1.0 (git+https://github.com/paritytech/pwasm-abi)",
  "pwasm-abi-derive 0.1.0 (git+https://github.com/paritytech/pwasm-abi)",
  "pwasm-ethereum 0.1.0 (git+https://github.com/nikvolf/pwasm-ethereum)",
- "pwasm-std 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pwasm-std 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "tiny-keccak 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -139,7 +139,7 @@ name = "pwasm-token-contract-bin"
 version = "0.1.0"
 dependencies = [
  "pwasm-abi 0.1.0 (git+https://github.com/paritytech/pwasm-abi)",
- "pwasm-std 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pwasm-std 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "pwasm-test 0.1.0 (git+https://github.com/paritytech/pwasm-test)",
  "pwasm-token-contract 0.1.0",
 ]
@@ -251,8 +251,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum pwasm-abi-derive 0.1.0 (git+https://github.com/paritytech/pwasm-abi)" = "<none>"
 "checksum pwasm-alloc 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "7a61e7a9bfd7bdf92cde93dc7f4d53aad318ffefb46b96b57458ddffe49a1357"
 "checksum pwasm-ethereum 0.1.0 (git+https://github.com/nikvolf/pwasm-ethereum)" = "<none>"
-"checksum pwasm-libc 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "160a70ad233b97bce3ee47e3d18bbf9aaf7f9985f59cd2b0718b26193811e6cd"
-"checksum pwasm-std 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "6a77a392f6c1f4a5981912406f5c9af1663cddcde2ba27ab1e7416b06030cea4"
+"checksum pwasm-libc 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "e2d059ec9ad3cc39d96c746657fc9408fd45e9bd5affcbd816b735373f870234"
+"checksum pwasm-std 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)" = "1d2441a05f3ee85d36a4e3a7d471965ba6487c9f9ec4e655b13d449d257c3176"
 "checksum pwasm-test 0.1.0 (git+https://github.com/paritytech/pwasm-test)" = "<none>"
 "checksum quote 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)" = "7a6e920b65c65f10b2ae65c831a81a073a89edd28c7cce89475bff467ab4167a"
 "checksum rustc-hex 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "0ceb8ce7a5e520de349e1fa172baeba4a9e8d5ef06c47471863530bc4972ee1e"
