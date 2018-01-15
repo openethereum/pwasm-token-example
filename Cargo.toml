@@ -11,10 +11,9 @@ pwasm-token-contract = { path = "contract" }
 [dev-dependencies]
 pwasm-test = { git = "https://github.com/paritytech/pwasm-test" }
 
-[[bin]]
-name = "token"
+[lib]
+crate-type = ["cdylib"]
 path = "src/token.rs"
 
 [profile.release]
 panic = "abort"
-lto = true
