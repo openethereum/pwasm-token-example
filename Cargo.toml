@@ -17,3 +17,4 @@ path = "src/token.rs"
 
 [profile.release]
 panic = "abort"
+lto = true
