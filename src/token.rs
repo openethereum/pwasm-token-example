@@ -1,5 +1,7 @@
 // Contract doesn't use standard library
 #![no_std]
+#![feature(wasm_import_memory)]
+#![wasm_import_memory]
 
 extern crate pwasm_std;
 extern crate pwasm_abi;
