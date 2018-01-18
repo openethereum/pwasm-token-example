@@ -1,4 +1,4 @@
-// Contract doesn't need standard library and the `main` function.
+// Contract doesn't use standard library
 #![no_std]
 
 extern crate pwasm_std;
