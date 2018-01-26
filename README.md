@@ -6,7 +6,7 @@ rustup target add wasm32-unknown-unknown --toolchain nightly
 ```
 - wasm build util, run
 ```
-cargo install --git https://github.com/paritytech/wasm-utils wasm-build`
+cargo install --git https://github.com/paritytech/wasm-utils wasm-build
 ```
 ## Build
 ```
