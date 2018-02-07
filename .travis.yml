@@ -2,7 +2,7 @@ language: rust
 rust:
   - nightly
 before_install:
-  - rustup target add wasm32-unknown-unknown --toolchain nightly
+  - rustup target add wasm32-unknown-unknown
   - cargo install --git https://github.com/paritytech/wasm-utils wasm-build
 script:
   - cargo test --manifest-path="contract/Cargo.toml" --features std

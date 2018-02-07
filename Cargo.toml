@@ -8,9 +8,6 @@ pwasm-std = "0.3"
 pwasm-abi = { git = "https://github.com/paritytech/pwasm-abi" }
 pwasm-token-contract = { path = "contract" }
 
-[dev-dependencies]
-pwasm-test = { git = "https://github.com/paritytech/pwasm-test" }
-
 [lib]
 crate-type = ["cdylib"]
 path = "src/token.rs"
