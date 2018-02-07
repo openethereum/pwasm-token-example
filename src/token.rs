@@ -25,5 +25,4 @@ pub fn deploy() {
 	let args = ext::input();
 	let mut endpoint = pwasm_token_contract::Endpoint::new(pwasm_token_contract::TokenContractInstance{});
 	endpoint.dispatch_ctor(&args);
-	ext::ret(&[]);
 }
