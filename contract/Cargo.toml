@@ -23,3 +23,7 @@ pwasm-test = { git = "https://github.com/paritytech/pwasm-test" }
 
 [features]
 std = ["pwasm-std/std", "pwasm-ethereum/std"]
+
+[replace]
+"pwasm-std:0.3.2" = { git = "https://github.com/paritytech/pwasm-std", branch="rlibc" }
+"pwasm-std:0.3.0" = { git = "https://github.com/paritytech/pwasm-std", branch="rlibc" }
