@@ -22,18 +22,18 @@ use pwasm_std::hash::{Address, H256};
 use bigint::U256;
 use pwasm_abi_derive::eth_abi;
 
-// TokenContract is an interface definition of a contract.
+// `TokenContract` is an interface definition of a contract.
 // The current example covers the minimal subset of ERC20 token standard.
 // eth_abi macro parses an interface (trait) definition of a contact and generates
 // two structs: `Endpoint` and `Client`.
 //
-// The `Endpoint` is an entry point for contract calls.
+// `Endpoint` is an entry point for contract calls.
 // eth_abi macro generates a table of Method IDs corresponding with every method signature defined in the trait
 // and defines it statically in the generated code.
 // See https://github.com/paritytech/pwasm-token-example/blob/master/src/token.rs how generated `Endpoint` is used in `call` and `deploy` (constructor).
 // `Endpoint` instantiates with a struct TokenContractInstance which implements the trait definition.
 //
-// The `Client` is a struct which is useful for call generation to a deployed contract. For example:
+// `Client` is a struct which is useful for call generation to a deployed contract. For example:
 // ```
 //     let mut client = Client::new(contactAddress);
 //     let balance = client
