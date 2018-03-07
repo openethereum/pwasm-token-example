@@ -23,7 +23,7 @@ use bigint::U256;
 use pwasm_abi_derive::eth_abi;
 
 // `TokenContract` is an interface definition of a contract.
-// The current example covers the minimal subset of ERC20 token standard.
+// The following example covers the minimal subset of ERC20 token standard.
 // eth_abi macro parses an interface (trait) definition of a contact and generates
 // two structs: `Endpoint` and `Client`.
 //
