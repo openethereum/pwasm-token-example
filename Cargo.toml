@@ -4,8 +4,8 @@ version = "0.1.0"
 authors = ["Alexey Frolov <frol.rage@gmail.com>"]
 
 [dependencies]
-pwasm-std = "0.3"
-pwasm-abi = { git = "https://github.com/paritytech/pwasm-abi" }
+pwasm-ethereum = "0.3"
+pwasm-abi = "0.1"
 pwasm-token-contract = { path = "contract" }
 
 [lib]

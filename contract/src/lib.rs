@@ -312,7 +312,7 @@ mod tests {
 		assert_eq!(contract.transferFrom(owner.clone(), samAddress.clone(), 1.into()), false);
 		assert_eq!(contract.balanceOf(samAddress.clone()), 10000.into());
 		assert_eq!(contract.balanceOf(owner.clone()), 30000.into());
-		assert_eq!(ext_get().logs().len(), 2, "Two events should be created");
+		assert_eq!(ext_get().logs().len(), 3, "Two events should be created");
 	}
 
 	#[test]
@@ -333,6 +333,6 @@ mod tests {
 		assert_eq!(contract.transferFrom(owner.clone(), samAddress.clone(), 40001.into()), false);
 		assert_eq!(contract.balanceOf(samAddress.clone()), 30000.into());
 		assert_eq!(contract.balanceOf(owner.clone()), 40000.into());
-		assert_eq!(ext_get().logs().len(), 0, "Should be no events created");
+		assert_eq!(ext_get().logs().len(), 2, "Should be no events created");
 	}
 }
