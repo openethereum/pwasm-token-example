@@ -16,6 +16,3 @@ path = "src/token.rs"
 panic = "abort"
 lto = true
 opt-level = "z"
-
-[replace]
-"pwasm-std:0.3.2" = { git = "https://github.com/paritytech/pwasm-std" }
