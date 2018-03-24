@@ -22,18 +22,18 @@ use pwasm_std::hash::{Address, H256};
 use bigint::U256;
 use pwasm_abi_derive::eth_abi;
 
-// TokenContract is an interface definition of a contract.
-// The current example covers the minimal subset of ERC20 token standard.
+// `TokenContract` is an interface definition of a contract.
+// The following example covers the minimal subset of ERC20 token standard.
 // eth_abi macro parses an interface (trait) definition of a contact and generates
-// two structs: Endpoint and Client.
+// two structs: `Endpoint` and `Client`.
 //
-// Endpoint is an entry point for contract calls.
+// `Endpoint` is an entry point for contract calls.
 // eth_abi macro generates a table of Method IDs corresponding with every method signature defined in the trait
 // and defines it statically in the generated code.
-// Scroll down at "pub fn call(desc: *mut u8)" to see how
-// Endpoint instantiates with a struct TokenContractInstance which implements the trait definition.
+// See https://github.com/paritytech/pwasm-token-example/blob/master/src/token.rs how generated `Endpoint` is used in `call` and `deploy` (constructor).
+// `Endpoint` instantiates with a struct TokenContractInstance which implements the trait definition.
 //
-// Client is a struct which is useful for call generation to a deployed contract. For example:
+// `Client` is a struct which is useful for call generation to a deployed contract. For example:
 // ```
 //     let mut client = Client::new(contactAddress);
 //     let balance = client
@@ -312,7 +312,7 @@ mod tests {
 		assert_eq!(contract.transferFrom(owner.clone(), samAddress.clone(), 1.into()), false);
 		assert_eq!(contract.balanceOf(samAddress.clone()), 10000.into());
 		assert_eq!(contract.balanceOf(owner.clone()), 30000.into());
-		assert_eq!(ext_get().logs().len(), 2, "Two events should be created");
+		assert_eq!(ext_get().logs().len(), 3, "Two events should be created");
 	}
 
 	#[test]
@@ -333,6 +333,6 @@ mod tests {
 		assert_eq!(contract.transferFrom(owner.clone(), samAddress.clone(), 40001.into()), false);
 		assert_eq!(contract.balanceOf(samAddress.clone()), 30000.into());
 		assert_eq!(contract.balanceOf(owner.clone()), 40000.into());
-		assert_eq!(ext_get().logs().len(), 0, "Should be no events created");
+		assert_eq!(ext_get().logs().len(), 2, "Should be no events created");
 	}
 }

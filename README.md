@@ -2,11 +2,11 @@
 ## Build prerequisites
 Install rust with `wasm32-unknown-unknown` target:
 ```
-rustup target add wasm32-unknown-unknown --toolchain nightly
+rustup target add wasm32-unknown-unknown
 ```
 Install Wasm build util:
 ```
-cargo install --git https://github.com/paritytech/wasm-utils wasm-build
+cargo install pwasm-utils --bin wasm-build
 ```
 ## Build
 Run:
