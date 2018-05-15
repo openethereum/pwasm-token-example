@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Alexey Frolov <frol.rage@gmail.com>"]
 
 [dependencies]
-pwasm-ethereum = "0.3"
+pwasm-ethereum = "0.4"
 pwasm-abi = "0.1"
 pwasm-token-contract = { path = "contract" }
 
