@@ -1,9 +1,12 @@
 language: rust
 rust:
   - nightly
+cache: cargo
 before_install:
   - rustup target add wasm32-unknown-unknown
-  - cargo install pwasm-utils --bin wasm-build
+  - command -v wasm-build || cargo install pwasm-utils-cli --bin wasm-build
+  - WATERFALL_BUILD=31834 ./wasm-install.sh
 script:
   - cargo test --manifest-path="contract/Cargo.toml" --features std
   - ./build.sh
+  - wasm-install/bin/wasm-validate compiled/token.wasm
