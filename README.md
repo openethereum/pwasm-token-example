@@ -6,7 +6,7 @@ rustup target add wasm32-unknown-unknown
 ```
 Install Wasm build util:
 ```
-cargo install pwasm-utils --bin wasm-build
+cargo install pwasm-utils-cli
 ```
 ## Build
 Run:
