@@ -143,7 +143,7 @@ impl TokenContract for TokenContractInstance {
 		let sender = eth::sender();
 		let senderBalance = read_balance_of(&sender);
 		let recipientBalance = read_balance_of(&to);
-		if amount == 0.into() || senderBalance < amount {
+    if amount == 0.into() || senderBalance < amount || to == sender {
 			false
 		} else {
 			let new_sender_balance = senderBalance - amount;
@@ -171,7 +171,7 @@ impl TokenContract for TokenContractInstance {
 		let recipientBalance = read_balance_of(&to);
 		let a_key = allowance_key(&from, &eth::sender());
 		let allowed = read_allowance(&a_key);
-		if  allowed < amount || amount == 0.into() || fromBalance < amount {
+		if  allowed < amount || amount == 0.into() || fromBalance < amount  || to == from {
 			false
 		} else {
 			let new_allowed = allowed - amount;
@@ -336,4 +336,19 @@ mod tests {
 		assert_eq!(contract.balanceOf(owner.clone()), 40000.into());
 		assert_eq!(ext_get().logs().len(), 2, "Should be no events created");
 	}
+
+  #[test]
+  fn should_not_transfer_to_self() {
+		let mut contract = TokenContractInstance{};
+    let owner_address = Address::from("0xea674fdde714fd979de3edf0f56aa9716b898ec8");
+    ext_reset(|e| e.sender(owner_address.clone()));
+    let total_supply = 10000.into();
+    contract.constructor(total_supply);
+    assert_eq!(contract.balanceOf(owner_address), total_supply);
+    assert_eq!(contract.transfer(owner_address, 1000.into()), false);
+    assert_eq!(contract.transferFrom(owner_address, owner_address, 1000.into()), false);
+    assert_eq!(contract.balanceOf(owner_address), 10000.into());
+    assert_eq!(ext_get().logs().len(), 0);
+  }
+ 
 }
