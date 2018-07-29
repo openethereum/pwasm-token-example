@@ -1,26 +1,19 @@
 #![cfg_attr(not(feature="std"), no_main)]
 #![cfg_attr(not(feature="std"), no_std)]
 
-#![feature(proc_macro)]
+#![feature(use_extern_macros)]
 #![feature(proc_macro_gen)]
-#![feature(alloc)]
 #![allow(non_snake_case)]
 
 extern crate tiny_keccak;
-extern crate alloc;
-extern crate bigint;
-extern crate parity_hash;
 extern crate pwasm_std;
 extern crate pwasm_ethereum;
 extern crate pwasm_abi;
 extern crate pwasm_abi_derive;
 
-use alloc::vec::Vec;
-
 use tiny_keccak::Keccak;
 use pwasm_ethereum as eth;
-use pwasm_std::hash::{Address, H256};
-use bigint::U256;
+use pwasm_abi::types::*;
 use pwasm_abi_derive::eth_abi;
 
 // `TokenContract` is an interface definition of a contract.
@@ -195,8 +188,6 @@ mod tests {
 	extern crate std;
 	use super::*;
 	use pwasm_test::{ext_reset, ext_update, ext_get, External};
-	use bigint::U256;
-	use pwasm_std::hash::{Address};
 
 	#[test]
 	fn balanceOf_should_return_balance() {
@@ -350,5 +341,5 @@ mod tests {
     assert_eq!(contract.balanceOf(owner_address), 10000.into());
     assert_eq!(ext_get().logs().len(), 0);
   }
- 
+
 }
