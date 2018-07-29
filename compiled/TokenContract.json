@@ -10,7 +10,7 @@
     ],
     "outputs": [
       {
-        "name": "returnValue",
+        "name": "returnValue0",
         "type": "uint256"
       }
     ],
@@ -22,7 +22,7 @@
     "inputs": [],
     "outputs": [
       {
-        "name": "returnValue",
+        "name": "returnValue0",
         "type": "uint256"
       }
     ],
@@ -43,7 +43,7 @@
     ],
     "outputs": [
       {
-        "name": "returnValue",
+        "name": "returnValue0",
         "type": "bool"
       }
     ],
@@ -68,7 +68,7 @@
     ],
     "outputs": [
       {
-        "name": "returnValue",
+        "name": "returnValue0",
         "type": "bool"
       }
     ],
@@ -89,7 +89,7 @@
     ],
     "outputs": [
       {
-        "name": "returnValue",
+        "name": "returnValue0",
         "type": "bool"
       }
     ],
@@ -110,7 +110,7 @@
     ],
     "outputs": [
       {
-        "name": "returnValue",
+        "name": "returnValue0",
         "type": "uint256"
       }
     ],
