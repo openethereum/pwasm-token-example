@@ -7,7 +7,6 @@ extern crate pwasm_token_contract;
 
 use pwasm_abi::eth::EndpointInterface;
 
-/// The main function receives a pointer for the call descriptor.
 #[no_mangle]
 pub fn call() {
 	let mut endpoint = pwasm_token_contract::Endpoint::new(pwasm_token_contract::TokenContractInstance{});
