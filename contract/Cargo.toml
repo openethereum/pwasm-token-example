@@ -5,7 +5,7 @@ authors = ["Alexey Frolov <frol.rage@gmail.com>"]
 
 [dependencies]
 pwasm-std = "0.10"
-pwasm-ethereum = "0.6.3" # not published yet
+pwasm-ethereum = "0.6.3"
 pwasm-abi = "0.1.9" # not published yet
 pwasm-abi-derive = "0.1.9" # not published yet
 tiny-keccak = "1.4.2"
