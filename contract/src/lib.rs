@@ -69,15 +69,11 @@ pub trait TokenContract {
 }
 
 lazy_static::lazy_static! {
-		static ref TOTAL_SUPPLY_KEY: H256 =
-			H256::from(
-				[2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-			);
-		static ref OWNER_KEY: H256 =
-			H256::from(
-				[3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-			);
-	}
+	static ref TOTAL_SUPPLY_KEY: H256 =
+		H256::from([2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+	static ref OWNER_KEY: H256 =
+		H256::from([3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+}
 
 // Reads balance by address
 fn read_balance_of(owner: &Address) -> U256 {
@@ -119,13 +115,13 @@ pub struct TokenContractInstance;
 
 impl TokenContract for TokenContractInstance {
 	fn constructor(&mut self, total_supply: U256) {
-		let sender = pwasm_ethereum::sender();
+		let sender = eth::sender();
 		// Set up the total supply for the token
-		pwasm_ethereum::write(&TOTAL_SUPPLY_KEY, &total_supply.into());
+		eth::write(&TOTAL_SUPPLY_KEY, &total_supply.into());
 		// Give all tokens to the contract owner
-		pwasm_ethereum::write(&balance_key(&sender), &total_supply.into());
+		eth::write(&balance_key(&sender), &total_supply.into());
 		// Set the contract owner
-		pwasm_ethereum::write(&OWNER_KEY, &H256::from(sender).into());
+		eth::write(&OWNER_KEY, &H256::from(sender).into());
 	}
 
 	fn balanceOf(&mut self, owner: Address) -> U256 {
@@ -140,7 +136,7 @@ impl TokenContract for TokenContractInstance {
 		let sender = eth::sender();
 		let senderBalance = read_balance_of(&sender);
 		let recipientBalance = read_balance_of(&to);
-	if amount == 0.into() || senderBalance < amount || to == sender {
+		if amount == 0.into() || senderBalance < amount || to == sender {
 			false
 		} else {
 			let new_sender_balance = senderBalance - amount;
@@ -196,8 +192,13 @@ mod tests {
 
 	#[test]
 	fn balanceOf_should_return_balance() {
-		ext_reset(|e| e.storage([1,0,0,0,0,0,0,0,0,0,0,0,
-							31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31].into(), U256::from(100000).into()));
+		ext_reset(|e| e.storage([
+					1,0,0,0,0,0,0,0,0,0,0,0,
+					31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31
+				].into(),
+				U256::from(100000).into()
+			)
+		);
 		let address = Address::from([31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31]);
 		let mut contract = TokenContractInstance{};
 		assert_eq!(contract.balanceOf(address), 100000.into());
@@ -217,7 +218,8 @@ mod tests {
 		ext_reset(|e| e);
 		let mut contract = TokenContractInstance{};
 		// set total supply to maximum value of an unsigned 256 bit integer
-		let total_supply = U256::from_dec_str("115792089237316195423570985008687907853269984665640564039457584007913129639935").unwrap();
+		let total_supply =
+			U256::from_dec_str("115792089237316195423570985008687907853269984665640564039457584007913129639935").unwrap();
 		assert_eq!(total_supply, U256::max_value());
 		contract.constructor(total_supply);
 		assert_eq!(contract.totalSupply(), total_supply);
@@ -249,9 +251,12 @@ mod tests {
 		assert_eq!(contract.transfer(sam_address, 1000.into()), true);
 		assert_eq!(ext_get().logs().len(), 1);
 		assert_eq!(ext_get().logs()[0].topics.as_ref(), &[
-			H256::from_str("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef").unwrap(), // hash of the event name
-			H256::from_str("000000000000000000000000ea674fdde714fd979de3edf0f56aa9716b898ec8").unwrap(), // sender address
-			H256::from_str("000000000000000000000000db6fd484cfa46eeeb73c71edee823e4812f9e2e1").unwrap() // recipient address
+			// hash of the event name
+			H256::from_str("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef").unwrap(),
+			// sender address
+			H256::from_str("000000000000000000000000ea674fdde714fd979de3edf0f56aa9716b898ec8").unwrap(),
+			// recipient address
+			H256::from_str("000000000000000000000000db6fd484cfa46eeeb73c71edee823e4812f9e2e1").unwrap()
 		]);
 		assert_eq!(ext_get().logs()[0].data.as_ref(), &[
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 232]);
@@ -279,9 +284,12 @@ mod tests {
 		contract.approve(spender, 40000.into());
 		assert_eq!(ext_get().logs().len(), 1, "Should be 1 event logged");
 		assert_eq!(ext_get().logs()[0].topics.as_ref(), &[
-			H256::from_str("8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925").unwrap(), // hash of the event name
-			H256::from_str("0000000000000000000000000000000000000000000000000000000000000000").unwrap(), // sender (owner) address
-			H256::from_str("000000000000000000000000db6fd484cfa46eeeb73c71edee823e4812f9e2e1").unwrap() // spender address
+			// hash of the event name
+			H256::from_str("8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925").unwrap(),
+			// sender (owner) address
+			H256::from_str("0000000000000000000000000000000000000000000000000000000000000000").unwrap(),
+			// spender address
+			H256::from_str("000000000000000000000000db6fd484cfa46eeeb73c71edee823e4812f9e2e1").unwrap()
 		]);
 		assert_eq!(contract.allowance(::pwasm_ethereum::sender(), spender.clone()), 40000.into());
 	}
@@ -291,8 +299,10 @@ mod tests {
 		ext_reset(|e| e);
 		let mut contract = TokenContractInstance{};
 		let owner = Address::zero();
-		let spender = Address::from_str("db6fd484cfa46eeeb73c71edee823e4812f9e2e1").unwrap();
-		let samAddress = Address::from_str("ea674fdde714fd979de3edf0f56aa9716b898ec8").unwrap();
+		let spender =
+			Address::from_str("db6fd484cfa46eeeb73c71edee823e4812f9e2e1").unwrap();
+		let samAddress =
+			Address::from_str("ea674fdde714fd979de3edf0f56aa9716b898ec8").unwrap();
 		contract.constructor(40000.into());
 		contract.approve(spender, 10000.into());
 
@@ -319,8 +329,10 @@ mod tests {
 		ext_reset(|e| e);
 		let mut contract = TokenContractInstance{};
 		let owner = Address::zero();
-		let spender = Address::from_str("db6fd484cfa46eeeb73c71edee823e4812f9e2e1").unwrap();
-		let samAddress = Address::from_str("ea674fdde714fd979de3edf0f56aa9716b898ec8").unwrap();
+		let spender =
+			Address::from_str("db6fd484cfa46eeeb73c71edee823e4812f9e2e1").unwrap();
+		let samAddress =
+			Address::from_str("ea674fdde714fd979de3edf0f56aa9716b898ec8").unwrap();
 		contract.constructor(70000.into());
 		contract.transfer(samAddress, 30000.into());
 		contract.approve(spender, 40000.into());
@@ -335,18 +347,18 @@ mod tests {
 		assert_eq!(ext_get().logs().len(), 2, "Should be no events created");
 	}
 
-  #[test]
-  fn should_not_transfer_to_self() {
-	let mut contract = TokenContractInstance{};
-	let owner_address = Address::from_str("ea674fdde714fd979de3edf0f56aa9716b898ec8").unwrap();
-	ext_reset(|e| e.sender(owner_address.clone()));
-	let total_supply = 10000.into();
-	contract.constructor(total_supply);
-	assert_eq!(contract.balanceOf(owner_address), total_supply);
-	assert_eq!(contract.transfer(owner_address, 1000.into()), false);
-	assert_eq!(contract.transferFrom(owner_address, owner_address, 1000.into()), false);
-	assert_eq!(contract.balanceOf(owner_address), 10000.into());
-	assert_eq!(ext_get().logs().len(), 0);
-  }
-
+	#[test]
+	fn should_not_transfer_to_self() {
+		let mut contract = TokenContractInstance{};
+		let owner_address =
+			Address::from_str("ea674fdde714fd979de3edf0f56aa9716b898ec8").unwrap();
+		ext_reset(|e| e.sender(owner_address.clone()));
+		let total_supply = 10000.into();
+		contract.constructor(total_supply);
+		assert_eq!(contract.balanceOf(owner_address), total_supply);
+		assert_eq!(contract.transfer(owner_address, 1000.into()), false);
+		assert_eq!(contract.transferFrom(owner_address, owner_address, 1000.into()), false);
+		assert_eq!(contract.balanceOf(owner_address), 10000.into());
+		assert_eq!(ext_get().logs().len(), 0);
+	}
 }
