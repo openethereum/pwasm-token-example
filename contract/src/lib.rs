@@ -186,7 +186,7 @@ extern crate pwasm_test;
 #[allow(non_snake_case)]
 mod tests {
 	extern crate std;
-	use core::str::FromStr;
+	use tests::std::str::FromStr;
 	use super::*;
 	use pwasm_test::{ext_reset, ext_update, ext_get, External};
 
