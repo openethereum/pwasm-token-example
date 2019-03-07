@@ -1,8 +1,5 @@
-#![cfg_attr(not(feature="std"), no_main)]
 #![cfg_attr(not(feature="std"), no_std)]
 
-#![feature(use_extern_macros)]
-#![feature(proc_macro_gen)]
 #![allow(non_snake_case)]
 
 extern crate tiny_keccak;
@@ -72,8 +69,13 @@ pub trait TokenContract {
 	fn Approval(&mut self, indexed_owner: Address, indexed_spender: Address, _value: U256);
 }
 
-static TOTAL_SUPPLY_KEY: H256 = H256([2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-static OWNER_KEY: H256 = H256([3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+fn total_supply_key() -> H256 {
+	H256::from([2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+}
+
+fn owner_key() -> H256 {
+	H256::from([3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+}
 
 // Reads balance by address
 fn read_balance_of(owner: &Address) -> U256 {
@@ -95,19 +97,19 @@ fn write_allowance(key: &H256, value: U256) {
 // Generates the "allowance" storage key to map owner and spender
 fn allowance_key(owner: &Address, spender: &Address) -> H256 {
 	let mut keccak = Keccak::new_keccak256();
-	let mut res = H256::new();
+	let mut res = H256::zero();
 	keccak.update("allowance_key".as_ref());
 	keccak.update(owner.as_ref());
 	keccak.update(spender.as_ref());
-	keccak.finalize(&mut res);
+	keccak.finalize(&mut res[..]);
 	res
 }
 
 // Generates a balance key for some address.
 // Used to map balances with their owners.
 fn balance_key(address: &Address) -> H256 {
-	let mut key = H256::from(address);
-	key[0] = 1; // just a naiive "namespace";
+	let mut key = H256::from(*address);
+	key.as_fixed_bytes_mut()[0] = 1; // just a naiive "namespace";
 	key
 }
 
@@ -117,11 +119,11 @@ impl TokenContract for TokenContractInstance {
 	fn constructor(&mut self, total_supply: U256) {
 		let sender = eth::sender();
 		// Set up the total supply for the token
-		eth::write(&TOTAL_SUPPLY_KEY, &total_supply.into());
+		eth::write(&total_supply_key(), &total_supply.into());
 		// Give all tokens to the contract owner
 		eth::write(&balance_key(&sender), &total_supply.into());
 		// Set the contract owner
-		eth::write(&OWNER_KEY, &H256::from(sender).into());
+		eth::write(&owner_key(), &H256::from(sender).into());
 	}
 
 	fn balanceOf(&mut self, owner: Address) -> U256 {
@@ -129,14 +131,14 @@ impl TokenContract for TokenContractInstance {
 	}
 
 	fn totalSupply(&mut self) -> U256 {
-		U256::from_big_endian(&eth::read(&TOTAL_SUPPLY_KEY))
+		U256::from_big_endian(&eth::read(&total_supply_key()))
 	}
 
 	fn transfer(&mut self, to: Address, amount: U256) -> bool {
 		let sender = eth::sender();
 		let senderBalance = read_balance_of(&sender);
 		let recipientBalance = read_balance_of(&to);
-    if amount == 0.into() || senderBalance < amount || to == sender {
+	if amount == 0.into() || senderBalance < amount || to == sender {
 			false
 		} else {
 			let new_sender_balance = senderBalance - amount;
@@ -331,15 +333,15 @@ mod tests {
   #[test]
   fn should_not_transfer_to_self() {
 		let mut contract = TokenContractInstance{};
-    let owner_address = Address::from("0xea674fdde714fd979de3edf0f56aa9716b898ec8");
-    ext_reset(|e| e.sender(owner_address.clone()));
-    let total_supply = 10000.into();
-    contract.constructor(total_supply);
-    assert_eq!(contract.balanceOf(owner_address), total_supply);
-    assert_eq!(contract.transfer(owner_address, 1000.into()), false);
-    assert_eq!(contract.transferFrom(owner_address, owner_address, 1000.into()), false);
-    assert_eq!(contract.balanceOf(owner_address), 10000.into());
-    assert_eq!(ext_get().logs().len(), 0);
+	let owner_address = Address::from("0xea674fdde714fd979de3edf0f56aa9716b898ec8");
+	ext_reset(|e| e.sender(owner_address.clone()));
+	let total_supply = 10000.into();
+	contract.constructor(total_supply);
+	assert_eq!(contract.balanceOf(owner_address), total_supply);
+	assert_eq!(contract.transfer(owner_address, 1000.into()), false);
+	assert_eq!(contract.transferFrom(owner_address, owner_address, 1000.into()), false);
+	assert_eq!(contract.balanceOf(owner_address), 10000.into());
+	assert_eq!(ext_get().logs().len(), 0);
   }
 
 }
